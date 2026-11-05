@@ -12,8 +12,8 @@ def test_verification():
     with open('QUATREVINGT-TREIZE.html', 'r', encoding='utf-8') as f:
         clean_html = f.read()
 
-    # 2. Get original raw text from git HEAD
-    orig_html = subprocess.check_output(['git', 'show', 'HEAD:QUATREVINGT-TREIZE.html']).decode('utf-8', errors='ignore')
+    # 2. Get original raw text from git initial commit
+    orig_html = subprocess.check_output(['git', 'show', '3b08562:QUATREVINGT-TREIZE.html']).decode('utf-8', errors='ignore')
 
     # Verify headings preservation counts
     orig_h1 = re.findall(r'<h1[^>]*>(.*?)</h1>', orig_html, re.S)
@@ -45,8 +45,8 @@ def test_verification():
     fn_orig = orig_html.find('<div id="ftn1">')
     orig_novel = orig_html[h1_orig:fn_orig]
 
-    h1_clean = clean_html.find('<main>')
-    fn_clean = clean_html.find('</main>')
+    h1_clean = clean_html.find('<div class="novel-body">')
+    fn_clean = clean_html.find('<div class="footnotes-section">')
     clean_novel = clean_html[h1_clean:fn_clean]
 
     def get_words(text):
@@ -60,19 +60,20 @@ def test_verification():
     assert orig_words == clean_words, f"Word match failed! {len(orig_words)} vs {len(clean_words)}"
     print(f"Preserved exactly {len(orig_words)} words (100% match).")
 
-    # Verify no Word Mso artifacts remain
+    # Verify no Word Mso artifacts or non-printable tags remain
     assert 'Mso' not in clean_html, "Found Mso artifacts in clean HTML"
     assert '@font-face' not in clean_html, "Found @font-face in clean HTML"
-    assert '<span' not in clean_html, "Found <span> tags in clean HTML"
+    assert '<a' not in clean_html, "Found <a> tags in clean HTML"
     assert 'ebooksgratuits' not in clean_html, "Found ebooksgratuits link in clean HTML"
     assert 'hugo.jpg' not in clean_html, "Found hugo.jpg reference in clean HTML"
+    assert 'id="_Toc' not in clean_html, "Found _Toc id in clean HTML"
+    assert 'viewport' not in clean_html, "Found viewport meta tag in clean HTML"
 
     # Verify footnotes integrity
-    assert '<section class="footnotes-section">' in clean_html
+    assert '<div class="footnotes-section">' in clean_html
     for i in range(1, 5):
-        assert f'href="#ftn{i}" id="ftnref{i}"' in clean_html, f"Footnote ref {i} missing"
-        assert f'id="ftn{i}" class="footnote-text"' in clean_html, f"Footnote text {i} missing"
-        assert f'href="#ftnref{i}" class="footnote-back"' in clean_html, f"Footnote backlink {i} missing"
+        assert f'<sup class="footnote-ref">[{i}]</sup>' in clean_html, f"Footnote ref {i} missing"
+        assert f'<span class="footnote-num">[{i}]</span>' in clean_html, f"Footnote text {i} missing"
 
     # Verify KDP @page CSS
     assert 'size: 6in 9in;' in clean_html

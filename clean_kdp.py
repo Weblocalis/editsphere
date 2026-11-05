@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
 """
 Clean and format QUATREVINGT-TREIZE.html for Amazon KDP print-on-demand (6" x 9").
+Strictly print-ready without non-printable tags, anchors, or interactive elements.
 """
 
 import re
+import subprocess
 
-def clean_html(input_path, output_path):
-    with open(input_path, 'r', encoding='utf-8', errors='ignore') as f:
-        content = f.read()
+def clean_html(output_path):
+    # Fetch original file from initial commit in git to work from original ground truth
+    orig_content = subprocess.check_output(['git', 'show', '3b08562:QUATREVINGT-TREIZE.html']).decode('utf-8', errors='ignore')
 
     # 1. Locate the main sections
-    # Find the first <h1> which marks the start of the novel body (after title & TOC)
-    h1_idx = content.find('<h1>')
+    h1_idx = orig_content.find('<h1>')
     if h1_idx == -1:
         raise ValueError("Could not find first <h1> tag")
 
-    # Everything after first <h1> until footnotes
-    body_and_notes = content[h1_idx:]
+    body_and_notes = orig_content[h1_idx:]
 
-    # Footnotes separator
     fn_idx = body_and_notes.find('<div id="ftn1">')
     if fn_idx != -1:
         novel_content = body_and_notes[:fn_idx]
@@ -27,106 +26,64 @@ def clean_html(input_path, output_path):
         novel_content = body_and_notes
         footnotes_content = ""
 
-    # 2. Extract footnotes cleanly
-    # Pattern for each footnote: <div id="ftn(\d+)">...</div>
+    # 2. Extract footnotes cleanly (for print: no <a> link, just bold [N])
     footnotes = []
     if footnotes_content:
         for m in re.finditer(r'<div id="ftn(\d+)">(.*?)</div>', footnotes_content, re.S):
             fn_id = m.group(1)
             fn_body = m.group(2)
-            # Remove Mso classes, spans, external links from footnote
-            # Find the text of footnote
-            # The structure is: <p class="MsoFootnoteText"><a href="...#_ftnrefN" ...>[N]</a>...text...</p>
-            # We want: <p id="ftnN"><a href="#ftnrefN" class="footnote-back">[N]</a> Text...</p>
-            # Remove any span tags
+            # Remove any span and a tags
             fn_body = re.sub(r'</?span[^>]*>', '', fn_body)
-            # Clean anchor href
-            fn_body = re.sub(r'<a\s+[^>]*href=[\'"][^\'"]*#_ftnref(\d+)[\'"][^>]*>(.*?)</a>',
-                             r'<a href="#ftnref\1" class="footnote-back">\2</a>', fn_body, flags=re.S)
+            fn_body = re.sub(r'</?a[^>]*>', '', fn_body)
             # Clean p tag
-            fn_body = re.sub(r'<p[^>]*>', f'<p id="ftn{fn_id}" class="footnote-text">', fn_body)
-            # Remove extraneous newlines/spaces
+            fn_body = re.sub(r'<p[^>]*>', f'<p class="footnote-text"><span class="footnote-num">[{fn_id}]</span> ', fn_body)
             fn_body = re.sub(r'\s+', ' ', fn_body).strip()
             footnotes.append(fn_body)
 
     # 3. Clean the novel content
-    # Remove all useless empty paragraphs: <p ...>(?:\s|&nbsp;|<span[^>]*>|</span>)*</p>
     def is_empty_p(p_inner):
         text = re.sub(r'<[^>]+>', '', p_inner)
         text = text.replace('&nbsp;', ' ').strip()
         return len(text) == 0
 
-    # Let's clean paragraphs and headings in novel_content
-    # First normalize newlines
     text = novel_content
 
-    # Remove OLE_LINK anchors
-    text = re.sub(r'<a name="OLE_LINK\d+"></a>', '', text)
-    text = re.sub(r'<a name="OLE_LINK\d+">', '', text)
-
-    # Clean footnote reference calls in novel text:
-    # e.g.: <a href="...#_ftn1" name="_ftnref1" ...><span ...>[1]...</span></a>
+    # Remove all anchor tags <a ...>...</a> or just <a>
+    # For footnote references in novel: replace <a ...>[N]...</a> with <sup class="footnote-ref">[{N}]</sup>
     def replace_ftn_ref(m):
         full = m.group(0)
         num_m = re.search(r'#_ftn(\d+)', full)
         if num_m:
             num = num_m.group(1)
-            return f'<sup class="footnote-ref"><a href="#ftn{num}" id="ftnref{num}">[{num}]</a></sup>'
-        return full
+            return f'<sup class="footnote-ref">[{num}]</sup>'
+        return ''
 
     text = re.sub(r'<a\s+[^>]*href=[\'"][^\'"]*#_ftn\d+[\'"][^>]*>.*?</a>', replace_ftn_ref, text, flags=re.S)
 
-    # Remove any stray page breaks or <br clear="all"...>
+    # Remove all remaining <a> and </a> tags completely
+    text = re.sub(r'</?a[^>]*>', '', text)
+
+    # Remove stray page breaks, hr, div
     text = re.sub(r'<br clear="?all"?[^>]*>', '', text, flags=re.I)
     text = re.sub(r'<hr[^>]*>', '', text, flags=re.I)
-    text = re.sub(r'<div[^>]*>', '', text, flags=re.I)
-    text = re.sub(r'</div>', '', text, flags=re.I)
+    text = re.sub(r'</?div[^>]*>', '', text, flags=re.I)
 
-    # Remove all <span> and </span> tags
+    # Remove all span tags
     text = re.sub(r'</?span[^>]*>', '', text)
 
-    # Remove all numbered anchor markers like <a name="1">
-    text = re.sub(r'<a name=\"\d+\">', '', text)
-
-    # Clean <a> anchors inside headings (like <a name="_Toc125052816">)
-    # We can keep an id on the heading for potential navigation
+    # Clean headings: remove any attributes (no id, no class)
     def clean_heading(m):
         tag = m.group(1)
         inner = m.group(2)
-        # extract Toc anchor name if any
-        toc_m = re.search(r'name=\"([^\"]+)\"', inner)
-        toc_id = f' id="{toc_m.group(1)}"' if toc_m else ''
-        # strip tags inside heading except <br>
-        # but replace <br> with a single <br>
-        clean_inner = re.sub(r'<a[^>]*>', '', inner)
-        clean_inner = re.sub(r'</a>', '', clean_inner)
-        clean_inner = re.sub(r'<br\s*/?>', '<br>', clean_inner, flags=re.I)
-        # clean whitespace
+        clean_inner = re.sub(r'<br\s*/?>', '<br>', inner, flags=re.I)
         lines = [line.strip() for line in clean_inner.split('<br>') if line.strip()]
         heading_text = '<br>'.join(lines)
-        return f'<{tag}{toc_id}>{heading_text}</{tag}>'
+        return f'<{tag}>{heading_text}</{tag}>'
 
     text = re.sub(r'<(h[1-4])[^>]*>(.*?)</\1>', clean_heading, text, flags=re.S)
 
-    # Now handle all <p ...>...</p> tags
-    # Parse paragraphs
-    p_pattern = re.compile(r'<p(?:\s+[^>]*)?>(.*?)</p>', re.S)
-
-    clean_paragraphs = []
-    for m in p_pattern.finditer(text):
-        p_body = m.group(1).strip()
-        if is_empty_p(p_body):
-            continue
-        # Clean any remaining internal redundant spaces/newlines
-        # Preserve <i>, <b>, <a>, <sup>
-        # Replace multiple spaces/newlines with a single space
-        p_body = re.sub(r'\s+', ' ', p_body).strip()
-        clean_paragraphs.append(f'<p>{p_body}</p>')
-
-    # We need to assemble headings and paragraphs in proper order.
-    # Rather than parsing p's separately, let's tokenize the flow:
-    # A regex that matches either a heading <h[1-4]...</h[1-4]> or a paragraph <p...</p>
-    block_pattern = re.compile(r'(<(?:h[1-4])[^>]*>.*?</(?:h[1-4])>|<p(?:\s+[^>]*)?>.*?</p>)', re.S)
+    # Tokenize headings and paragraphs in proper order
+    block_pattern = re.compile(r'(<(?:h[1-4])>.*?</(?:h[1-4])>|<p(?:\s+[^>]*)?>.*?</p>)', re.S)
 
     cleaned_blocks = []
     for match in block_pattern.finditer(text):
@@ -134,7 +91,6 @@ def clean_html(input_path, output_path):
         if block.startswith('<h'):
             cleaned_blocks.append(block)
         elif block.startswith('<p'):
-            # check if empty
             inner = re.sub(r'^<p(?:\s+[^>]*)?>|</p>$', '', block, flags=re.S).strip()
             if not is_empty_p(inner):
                 inner = re.sub(r'\s+', ' ', inner).strip()
@@ -142,11 +98,11 @@ def clean_html(input_path, output_path):
 
     # 4. Construct Title Page
     title_page_html = """\
-\t<section class="title-page">
+\t<div class="title-page">
 \t\t<p class="book-author">Victor Hugo</p>
 \t\t<h1 class="book-title">QUATREVINGT-TREIZE</h1>
 \t\t<p class="book-year">(1873)</p>
-\t</section>
+\t</div>
 """
 
     # 5. Footnotes section HTML
@@ -154,10 +110,10 @@ def clean_html(input_path, output_path):
     if footnotes:
         fn_items = "\n".join(f"\t\t{fn}" for fn in footnotes)
         footnotes_section_html = f"""\
-\t<section class="footnotes-section">
+\t<div class="footnotes-section">
 \t\t<h2>Notes</h2>
 {fn_items}
-\t</section>
+\t</div>
 """
 
     # 6. Build the novel body HTML
@@ -165,8 +121,6 @@ def clean_html(input_path, output_path):
 
     # 7. Complete HTML document with Amazon KDP 6"x9" CSS
     css_content = """\
-\t\t@charset "UTF-8";
-
 \t\t/* Configuration de la page pour impression Amazon KDP roman 6" x 9" (152,4 mm x 228,6 mm) */
 \t\t@page {
 \t\t\tsize: 6in 9in;
@@ -302,11 +256,6 @@ def clean_html(input_path, output_path):
 \t\t\tline-height: 0;
 \t\t}
 
-\t\tsup.footnote-ref a {
-\t\t\tcolor: inherit;
-\t\t\ttext-decoration: none;
-\t\t}
-
 \t\t.footnotes-section {
 \t\t\tpage-break-before: always;
 \t\t\tbreak-before: page;
@@ -328,16 +277,9 @@ def clean_html(input_path, output_path):
 \t\t\ttext-indent: 0;
 \t\t}
 
-\t\t.footnote-back {
+\t\t.footnote-num {
 \t\t\tfont-weight: bold;
-\t\t\tcolor: inherit;
-\t\t\ttext-decoration: none;
 \t\t\tmargin-right: 0.3em;
-\t\t}
-
-\t\ta {
-\t\t\tcolor: inherit;
-\t\t\ttext-decoration: none;
 \t\t}
 """
 
@@ -345,7 +287,6 @@ def clean_html(input_path, output_path):
 <html lang="fr">
 <head>
 \t<meta charset="UTF-8">
-\t<meta name="viewport" content="width=device-width, initial-scale=1.0">
 \t<title>QUATREVINGT-TREIZE - Victor Hugo</title>
 \t<style>
 {css_content}
@@ -354,9 +295,9 @@ def clean_html(input_path, output_path):
 <body>
 
 {title_page_html}
-<main>
+<div class="novel-body">
 {novel_body_html}
-</main>
+</div>
 
 {footnotes_section_html}
 </body>
@@ -369,4 +310,4 @@ def clean_html(input_path, output_path):
     print(f"Successfully cleaned and generated {output_path}")
 
 if __name__ == '__main__':
-    clean_html('QUATREVINGT-TREIZE.html', 'QUATREVINGT-TREIZE.html.clean')
+    clean_html('QUATREVINGT-TREIZE.html')
