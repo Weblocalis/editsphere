@@ -1,0 +1,49 @@
+name: Intérieurs KDP
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      format:
+        description: "Format KDP en pouces (6x9, 5.5x8.5, 5x8, 5.25x8…)"
+        default: "6x9"
+      livre:
+        description: "Nom d'un fichier du dossier victor-hugo (vide = tous les livres)"
+        default: ""
+      taille_police:
+        description: "Corps du texte en points"
+        default: "11"
+
+jobs:
+  interieurs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dépendances système (Pango pour WeasyPrint)
+        run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+      - name: Dépendances Python
+        run: pip install -r requirements-dev.txt
+      - name: Tests
+        run: python -m pytest -q tests
+      - name: Nettoyage et PDF intérieurs
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          FORMAT: ${{ inputs.format }}
+          LIVRE: ${{ inputs.livre }}
+          TAILLE: ${{ inputs.taille_police }}
+        run: |
+          if [ -n "$LIVRE" ]; then
+            python clean_kdp.py "victor-hugo/$LIVRE" --format "$FORMAT" --taille-police "$TAILLE"
+          else
+            python clean_kdp.py --format "$FORMAT" --taille-police "$TAILLE"
+          fi
+      - name: Téléversement des PDF
+        if: github.event_name == 'workflow_dispatch' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: interieurs-kdp-${{ inputs.format }}
+          path: sortie/
