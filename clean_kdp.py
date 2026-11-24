@@ -22,6 +22,7 @@ import argparse
 import html
 import json
 import re
+import shutil
 import sys
 import time
 import unicodedata
@@ -65,6 +66,9 @@ GUTTER_COMFORT = 0.25   # pouces ajoutés au minimum KDP pour le confort de lect
 OUTSIDE_MARGIN = 0.55   # grand fond
 TOP_MARGIN = 0.8        # le titre courant est placé dans cette marge
 BOTTOM_MARGIN = 0.75    # le folio est placé dans cette marge
+
+
+SOURCE_SUFFIXES = (".html", ".htm", ".mhtml", ".mht")
 
 
 def kdp_min_gutter(pages: int) -> float:
@@ -180,6 +184,7 @@ class Book:
     verse_lines: int = 0
     images_kept: int = 0
     low_res: list[str] = field(default_factory=list)
+    image_files: dict[str, Path] = field(default_factory=dict)  # images à copier à côté du HTML
 
 
 def _remove_after(node: Tag) -> None:
@@ -242,6 +247,27 @@ def _note_number(value: str) -> str | None:
     return match.group(1) if match else None
 
 
+TITLE_LINK_RE = re.compile(r"^(?:ou|or|et|suivi(?:e)?s? de|précédée? de|avec)$", re.I)
+
+
+def join_title_lines(lines: list[str]) -> str:
+    """Joint les lignes d'un titre : « ou » + « LE SECRET » -> « ou LE SECRET »."""
+    out = ""
+    for line in lines:
+        if not out:
+            out = line
+        elif TITLE_LINK_RE.match(out.split(" – ")[-1]):
+            out += " " + line
+        else:
+            out += " – " + line
+    return out
+
+
+def title_separator(subtitle: str) -> str:
+    """« LES CAPUCINS ou LE SECRET… » mais « LES MISÉRABLES – Tome I »."""
+    return " " if re.match(r"(?i)ou\b", subtitle or "") else " – "
+
+
 def extract_metadata(soup: BeautifulSoup, book: Book) -> None:
     def first(selectors: str) -> Tag | None:
         return soup.select_one(selectors)
@@ -260,7 +286,7 @@ def extract_metadata(soup: BeautifulSoup, book: Book) -> None:
         lines = [line for line in lines if line]
         if lines:
             book.title = lines[0]
-            book.subtitle = " – ".join(lines[1:])
+            book.subtitle = join_title_lines(lines[1:])
     if not book.title:
         tag = soup.find("title")
         if tag:
@@ -457,7 +483,8 @@ def process_images(soup: BeautifulSoup, body: Tag, source: Path, book: Book | No
         width = width or natural
         parent = img.find_parent("p")
         alone = parent is not None and not text_of(parent)
-        new = soup.new_tag("img", attrs={"src": local.as_uri(), "alt": "",
+        book.image_files[local.name] = local
+        new = soup.new_tag("img", attrs={"src": "images/" + urllib.parse.quote(local.name), "alt": "",
                                          "class": "fig" if alone else "inl",
                                          "style": f"width:{width}px"})
         img.replace_with(new)
@@ -818,7 +845,7 @@ def font_faces() -> str:
         path = FONTS_DIR / f"EBGaramond-{name}.ttf"
         if path.exists():
             rules.append(f"@font-face{{font-family:'EB Garamond';font-style:{style};"
-                         f"font-weight:{weight};src:url('{path.as_uri()}');}}")
+                         f"font-weight:{weight};src:url('fonts/{path.name}');}}")
     return "\n".join(rules)
 
 
@@ -929,8 +956,9 @@ def toc_entries(book: Book) -> list[tuple[int, str, str]]:
 def build_print_html(book: Book, layout: Layout) -> str:
     esc = lambda value: html.escape(value or "", quote=True)  # noqa: E731
     title, author = book.title, book.author
+    subtitle_sep = title_separator(book.subtitle)
     legal = [
-        f"<p><i>{esc(title)}</i>{' – ' + esc(book.subtitle) if book.subtitle else ''}</p>",
+        f"<p><i>{esc(title)}</i>{subtitle_sep + esc(book.subtitle) if book.subtitle else ''}</p>",
         f"<p>{esc(author)}</p>" if author else "",
         (f"<p>Texte original publié en {esc(book.year)}, appartenant au domaine public.</p>"
          if book.year else "<p>Texte appartenant au domaine public.</p>"),
@@ -985,18 +1013,33 @@ def build_print_html(book: Book, layout: Layout) -> str:
 """
 
 
+def copy_assets(book: Book, folder: Path) -> None:
+    """Copie polices et images à côté du HTML : le dossier reste autonome et déplaçable."""
+    fonts = folder / "fonts"
+    fonts.mkdir(parents=True, exist_ok=True)
+    for font in list(FONTS_DIR.glob("EBGaramond-*.ttf")) + [FONTS_DIR / "OFL.txt"]:
+        if font.is_file():
+            shutil.copy2(font, fonts / font.name)
+    if book.image_files:
+        images = folder / "images"
+        images.mkdir(exist_ok=True)
+        for name, path in book.image_files.items():
+            shutil.copy2(path, images / name)
+
+
 def render_pdf(book: Book, layout: Layout, pdf_path: Path, log) -> tuple[int, Layout]:
     try:
         from weasyprint import HTML
     except ImportError:  # pragma: no cover
         raise SystemExit("WeasyPrint n'est pas installé : pip install -r requirements.txt")
+    copy_assets(book, pdf_path.parent)
     tried: dict[float, object] = {}
     inside = layout.inside
     document = None
     for _ in range(4):
         layout.inside = inside
         start = time.time()
-        document = HTML(string=build_print_html(book, layout), base_url=str(ROOT)).render()
+        document = HTML(string=build_print_html(book, layout), base_url=str(pdf_path.parent) + "/").render()
         pages = len(document.pages)
         log(f"   rendu : {pages} pages avec petit fond {inside:.3f} po ({time.time() - start:.0f} s)")
         tried[inside] = document
@@ -1032,6 +1075,7 @@ def process(source: Path, output_dir: Path, options: dict) -> tuple[str, bool, s
                         font_size=options["font_size"], toc=options["toc"],
                         chapter_recto=options["recto"] and not many_parts,
                         publisher=options["publisher"], isbn=options["isbn"])
+        copy_assets(book, folder)
         (folder / f"{slug}.html").write_text(build_print_html(book, layout), encoding="utf-8")
         pages = None
         if options["pdf"]:
@@ -1056,7 +1100,7 @@ def process(source: Path, output_dir: Path, options: dict) -> tuple[str, bool, s
 
 def write_report(book: Book, layout: Layout, pages: int | None, path: Path,
                  render_log: list[str]) -> str:
-    out = [f"{book.title}{' – ' + book.subtitle if book.subtitle else ''}",
+    out = [f"{book.title}{title_separator(book.subtitle) + book.subtitle if book.subtitle else ''}",
            f"Auteur : {book.author or '?'}   Année : {book.year or '?'}",
            f"Source : {book.source.name}", ""]
     out.append(f"Mots du texte : {book.words_output} "
@@ -1133,7 +1177,7 @@ def main(argv: list[str] | None = None) -> int:
         if not input_dir.is_dir():
             parser.error(f"dossier source introuvable : {input_dir}")
         sources = sorted((p for p in input_dir.iterdir()
-                          if p.is_file() and p.suffix.lower() in (".html", ".htm", ".mhtml")),
+                          if p.is_file() and p.suffix.lower() in SOURCE_SUFFIXES),
                          key=lambda p: p.name.casefold())
     if not sources:
         print("Aucun livre trouvé.")

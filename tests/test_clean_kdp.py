@@ -97,3 +97,22 @@ def test_pdf_has_kdp_trim_size(tmp_path):
                 descriptor = descendant[0].get_object()["/FontDescriptor"].get_object()
                 assert "/FontFile2" in descriptor or "/FontFile3" in descriptor  # incorporée
     assert any("Garamond" in name for name in fonts), fonts
+
+
+def test_title_lines_join_alternative_title():
+    assert clean_kdp.join_title_lines(["ou", "LE SECRET DU CABINET NOIR"]) == "ou LE SECRET DU CABINET NOIR"
+    assert clean_kdp.join_title_lines(["Tome I", "FANTINE"]) == "Tome I – FANTINE"
+    assert clean_kdp.title_separator("ou le secret") == " "
+    assert clean_kdp.title_separator("Tome I") == " – "
+
+
+def test_mht_extension_is_listed(tmp_path):
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "livre.mht").write_bytes((BOOKS / "CLAUDE GUEUX.html").read_bytes())
+    out = tmp_path / "out"
+    assert clean_kdp.main(["--dossier-source", str(src), "--dossier-sortie", str(out), "--sans-pdf"]) == 0
+    html_out = (out / "livre" / "livre.html").read_text(encoding="utf-8")
+    # le HTML est autonome : polices copiées à côté, chemins relatifs
+    assert "url('fonts/EBGaramond-Regular.ttf')" in html_out and "file://" not in html_out
+    assert (out / "livre" / "fonts" / "EBGaramond-Regular.ttf").is_file()
