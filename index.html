@@ -4,114 +4,2570 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f4f0">
-  <title>EditSphere — atelier de mise en page KDP</title>
+  <meta name="description" content="Atelier de mise en page et de préparation de livres du domaine public (EPUB, HTML, MHT) pour impression brochée Amazon KDP. Extraction du texte intégral pur sans notes ni TOC d'origine, et régénération complète des métadonnées éditeur.">
+  <meta property="og:title" content="EditSphere — Atelier KDP Domaine Public (Texte Intégral Pur)">
+  <meta property="og:description" content="Extraction du texte intégral pur (sans notes, sans anciennes tables des matières) et régénération complète de vos métadonnées d'éditeur pour Amazon KDP broché.">
+  <title>EditSphere — Atelier KDP Domaine Public (Texte Intégral Pur)</title>
+  <script src="/vendor/jszip.min.js"></script>
   <style>
-    :root{color-scheme:light;--ink:#202322;--muted:#777c78;--line:#e7e6e1;--paper:#fffefa;--canvas:#f5f4f0;--green:#315c4b;--green-soft:#e8f0eb;--gold:#c39a53;--red:#a64d42;--shadow:0 12px 40px #27251d0b}
-    *{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8fb6a2;outline-offset:2px}.app{min-height:100vh}.topbar{height:68px;background:#fffefa;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 36px;position:sticky;top:0;z-index:3}.brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:16px;letter-spacing:-.3px}.brand-mark{height:31px;width:31px;background:var(--green);color:#fff;border-radius:9px;display:grid;place-items:center;font-family:Georgia,serif;font-size:18px}.brand small{display:block;color:#969892;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}.top-actions{display:flex;align-items:center;gap:12px}.save-indicator{color:var(--muted);font-size:12px;display:flex;gap:7px;align-items:center}.save-indicator:before{content:"";width:7px;height:7px;background:#6b9a77;border-radius:50%}.button{border:1px solid var(--line);background:white;color:var(--ink);border-radius:8px;padding:9px 13px;font-size:12px;font-weight:650;transition:.15s}.button:hover{border-color:#b9c6be;transform:translateY(-1px)}.button.primary{background:var(--green);border-color:var(--green);color:white}.button.primary:hover{background:#244b3a}.button:disabled{opacity:.45;cursor:not-allowed;transform:none}.shell{max-width:1450px;margin:0 auto;padding:34px 38px 52px}.intro{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px}.eyebrow{font-size:10px;font-weight:700;color:var(--green);letter-spacing:.12em;text-transform:uppercase}.intro h1{font:500 30px/1.15 Georgia,"Times New Roman",serif;letter-spacing:-.7px;margin:8px 0 5px}.intro p{margin:0;color:var(--muted);font-size:13px}.stepper{display:flex;gap:7px;align-items:center;color:#858984;font-size:11px}.step{width:21px;height:21px;border:1px solid #d7d9d3;border-radius:50%;display:grid;place-items:center;font-size:10px}.step.active{background:var(--green);border-color:var(--green);color:#fff}.step-line{width:25px;height:1px;background:#dcdcd6}.workspace{display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px;align-items:start}.panel{background:#fffefa;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}.controls{overflow:hidden}.panel-head{padding:18px 20px 15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panel-head h2{font-size:13px;margin:0;font-weight:700}.panel-head span{font-size:10px;color:#969892}.section{padding:16px 20px;border-bottom:1px solid var(--line)}.section:last-child{border-bottom:0}.section-title{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:13px}.section-title em{font-style:normal;color:#a1a49f;font-weight:500;font-size:10px}.dropzone{height:103px;border:1px dashed #c9cec8;background:#fafbf8;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;transition:.15s}.dropzone:hover,.dropzone.dragover{background:#f0f5f1;border-color:#789a85}.upload-icon{width:27px;height:27px;border-radius:8px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin-bottom:6px;font-size:15px}.dropzone strong{font-size:11px}.dropzone span{font-size:10px;color:var(--muted);margin-top:3px}.file-info{display:none;margin-top:9px;background:#f7f7f3;border-radius:7px;padding:8px 10px;align-items:center;justify-content:space-between;font-size:10px}.file-info.visible{display:flex}.file-info strong{max-width:225px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.text-button{border:0;background:none;color:var(--green);font-size:10px;font-weight:650;padding:3px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{min-width:0}.field.full{grid-column:1/-1}.field label{display:block;color:#777c78;font-size:10px;margin:0 0 5px}.field input,.field select{width:100%;height:34px;padding:0 9px;background:#fff;border:1px solid #e3e3dd;border-radius:6px;color:var(--ink);font-size:11px}.field input::placeholder{color:#b0b2ac}.preset-row{display:flex;gap:6px;margin-bottom:13px}.preset{border:1px solid var(--line);border-radius:6px;background:#fff;color:#6f746f;padding:6px 9px;font-size:10px}.preset.active{border-color:#9eb6a5;color:var(--green);background:#f2f6f3;font-weight:650}.details{display:grid;grid-template-columns:1fr 1fr;gap:10px}.divider{height:1px;background:var(--line);margin:13px 0}.toggle-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#515652;margin-top:11px}.toggle{position:relative;width:30px;height:17px}.toggle input{opacity:0;width:0;height:0}.toggle span{position:absolute;inset:0;border-radius:20px;background:#d7d9d3;transition:.15s;cursor:pointer}.toggle span:before{content:"";position:absolute;width:13px;height:13px;background:white;border-radius:50%;top:2px;left:2px;transition:.15s;box-shadow:0 1px 2px #0002}.toggle input:checked+span{background:var(--green)}.toggle input:checked+span:before{transform:translateX(13px)}.notice{margin:13px 20px 17px;padding:9px 10px;background:#f7f5ef;border:1px solid #ece8dd;border-radius:7px;color:#777366;font-size:10px;line-height:1.45}.notice b{color:#5c594e}.preview-panel{min-width:0;overflow:hidden}.preview-head{height:54px;padding:0 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.preview-heading{display:flex;gap:9px;align-items:center}.preview-heading h2{font-size:12px;margin:0}.preview-heading span{padding:3px 7px;background:#f2f2ee;border-radius:4px;color:#80847e;font-size:9px}.preview-actions{display:flex;gap:6px}.icon-button{height:28px;padding:0 9px;border:1px solid var(--line);background:#fff;border-radius:6px;color:#747872;font-size:10px}.icon-button.active{color:var(--green);border-color:#a5bbac;background:#f2f6f3}.preview-area{background:#eeede8;min-height:695px;padding:28px 25px;display:flex;justify-content:center;align-items:flex-start;overflow:auto}.paper-wrap{width:min(100%,510px);filter:drop-shadow(0 8px 16px #2b2a2414)}.book-page{background:var(--paper);aspect-ratio:6/9;width:100%;overflow:hidden;padding:13% 13.5%;position:relative;color:#262522}.book-page-content{width:100%;height:100%;overflow:hidden}.book-page .sample-title{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:12% 4%;font-family:Georgia,serif}.sample-author{font-size:clamp(10px,1.1vw,13px);letter-spacing:.14em;text-transform:uppercase}.sample-book-title{font-size:clamp(20px,2.5vw,31px);line-height:1.2;margin:28px 0;font-weight:700;letter-spacing:.035em}.sample-year{font-size:12px;color:#777}.sample-content{font-family:Georgia,"Times New Roman",serif;font-size:clamp(9px,1vw,12px);line-height:1.48;text-align:justify}.sample-content h1,.sample-content h2,.sample-content h3,.sample-content h4,.sample-content h5{text-align:center;font-weight:400;line-height:1.25;break-after:avoid}.sample-content h1,.sample-content h2{break-before:page}.sample-content h1{font-size:1.4em}.sample-content h2{font-size:1.2em}.sample-content h3{font-size:1.08em}.sample-content p{margin:0;text-indent:1.5em}.sample-content h1+p,.sample-content h2+p,.sample-content h3+p{ text-indent:0}.sample-content p.align-right{text-align:right;font-style:italic;text-indent:0}.sample-content img{max-width:100%;height:auto}.empty-state{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:#8a8d87;font-size:11px}.empty-state .book-symbol{font:40px Georgia;color:#c4c7bf;margin-bottom:9px}.preview-foot{height:42px;border-top:1px solid var(--line);padding:0 17px;display:flex;align-items:center;justify-content:space-between;color:#8c908a;font-size:10px}.preview-foot strong{font-weight:500;color:#656a64}.status{display:flex;gap:6px;align-items:center}.status:before{content:"";width:6px;height:6px;border-radius:50%;background:#b7bbb4}.status.ready:before{background:#659572}.status.warning:before{background:#c49a53}.quality{margin-top:17px;background:#fffefa;border:1px solid var(--line);border-radius:10px;padding:14px 17px;display:flex;align-items:center;gap:12px}.quality-icon{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:#f2f4ee;color:#72856e;font-size:14px}.quality-copy{flex:1}.quality-copy strong{display:block;font-size:11px}.quality-copy span{font-size:10px;color:var(--muted)}.quality-count{font-size:10px;color:#858982}.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);background:#272d29;color:#fff;border-radius:8px;padding:10px 15px;font-size:12px;opacity:0;transition:.2s;pointer-events:none;z-index:9;box-shadow:0 5px 20px #0002}.toast.show{opacity:1;transform:translate(-50%,0)}.hidden{display:none!important}
-    @media(max-width:1050px){.workspace{grid-template-columns:340px minmax(0,1fr)}.shell{padding:28px 22px}.topbar{padding:0 23px}.preview-area{padding:22px 14px;min-height:620px}}
-    @media(max-width:760px){.topbar{height:59px;padding:0 15px}.shell{padding:23px 13px 35px}.intro{align-items:flex-start;gap:14px}.intro h1{font-size:25px}.stepper{display:none}.workspace{grid-template-columns:1fr}.controls{order:2}.preview-panel{order:1}.preview-area{min-height:480px;padding:18px 13px}.paper-wrap{max-width:375px}.save-indicator{display:none}.top-actions{gap:7px}.button{padding:8px 10px}.panel-head{padding:15px 16px}.section{padding:15px 16px}.notice{margin:12px 16px 15px}.brand{font-size:14px}}
-    @media print{.topbar,.intro,.controls,.preview-head,.preview-foot,.quality{display:none!important}.shell{padding:0}.workspace{display:block}.preview-panel{border:0;box-shadow:none}.preview-area{padding:0;background:white;min-height:0}.paper-wrap{width:100%;filter:none}.book-page{box-shadow:none}}
+    @font-face{font-family:'EB Garamond';font-style:normal;font-weight:400;src:url('/fonts/EBGaramond-Regular.ttf') format('truetype')}
+    @font-face{font-family:'EB Garamond';font-style:italic;font-weight:400;src:url('/fonts/EBGaramond-Italic.ttf') format('truetype')}
+    @font-face{font-family:'EB Garamond';font-style:normal;font-weight:700;src:url('/fonts/EBGaramond-Bold.ttf') format('truetype')}
+    @font-face{font-family:'EB Garamond';font-style:italic;font-weight:700;src:url('/fonts/EBGaramond-BoldItalic.ttf') format('truetype')}
+    @font-face{font-family:'Garamond';font-style:normal;font-weight:400;src:url('/fonts/EBGaramond-Regular.ttf') format('truetype')}
+    @font-face{font-family:'Garamond';font-style:italic;font-weight:400;src:url('/fonts/EBGaramond-Italic.ttf') format('truetype')}
+    @font-face{font-family:'Garamond';font-style:normal;font-weight:700;src:url('/fonts/EBGaramond-Bold.ttf') format('truetype')}
+    @font-face{font-family:'Garamond';font-style:italic;font-weight:700;src:url('/fonts/EBGaramond-BoldItalic.ttf') format('truetype')}
+
+    :root{
+      color-scheme:light;
+      --ink:#1a1d1b;
+      --ink-soft:#3f4340;
+      --muted:#707570;
+      --line:#e2e0d8;
+      --paper:#fffefa;
+      --paper-cream:#fbf8f0;
+      --canvas:#f4f3ee;
+      --canvas-subtle:#ecebe4;
+      --green:#244c3c;
+      --green-hover:#1a382c;
+      --green-soft:#e9f1ec;
+      --green-border:#b4cdbf;
+      --gold:#b88b3e;
+      --gold-soft:#fcf7ec;
+      --red:#9c3e32;
+      --shadow:0 12px 32px #1e201b12;
+    }
+    *{box-sizing:border-box}
+    html,body{max-width:100vw;overflow-x:hidden;position:relative;-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--canvas);color:var(--ink);font:13.5px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+    .app{min-height:100vh;width:100%;max-width:100vw;overflow-x:hidden;display:flex;flex-direction:column}
+    
+    /* Topbar */
+    .topbar{height:62px;background:#fffefa;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:40;width:100%;max-width:100vw;box-sizing:border-box}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-.3px;flex-shrink:0}
+    .brand-mark{height:32px;width:32px;background:var(--green);color:#fff;border-radius:8px;display:grid;place-items:center;font-family:'EB Garamond',Georgia,serif;font-size:19px;box-shadow:0 2px 6px #244c3c33;flex-shrink:0}
+    .brand-copy small{display:block;color:var(--muted);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+    .top-meta{display:flex;align-items:center;gap:8px}
+    .kdp-stat{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-soft);background:#f6f6f1;padding:5px 8px;border-radius:6px;border:1px solid var(--line);white-space:nowrap}
+    .kdp-stat.highlight{background:var(--green-soft);border-color:var(--green-border);color:var(--green);font-weight:600}
+    .kdp-stat strong{color:var(--ink);font-weight:650}
+    .top-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:8px 12px;font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;white-space:nowrap;min-height:34px}
+    .button:hover{border-color:#b5bcb6;transform:translateY(-1px);box-shadow:0 2px 6px #0000000a}
+    .button.primary{background:var(--green);border-color:var(--green);color:#fff}
+    .button.primary:hover{background:var(--green-hover);border-color:var(--green-hover)}
+    .button.secondary{background:var(--green-soft);border-color:var(--green-border);color:var(--green)}
+    .button.secondary:hover{background:#dfebd6}
+    .button:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+    
+    .btn-text-short{display:none}
+    .btn-text-full{display:inline}
+    
+    /* Mobile KDP Strip */
+    .mobile-kdp-strip{display:none}
+    
+    /* Shell */
+    .shell{max-width:1650px;margin:0 auto;padding:20px 24px 44px;width:100%;box-sizing:border-box}
+    .header-intro{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}
+    .kicker{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.12em;text-transform:uppercase}
+    .header-intro h1{font:500 clamp(20px, 3.2vw, 28px)/1.2 'EB Garamond',Georgia,serif;letter-spacing:-.4px;margin:4px 0 3px}
+    .header-intro p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.45}
+    
+    /* Workspace */
+    .workspace{display:grid;grid-template-columns:440px minmax(0,1fr);gap:20px;align-items:start;width:100%}
+    .panel{background:#fffefa;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;width:100%}
+    
+    /* Tabs Navigation */
+    .tabs-nav{display:flex;background:#f6f5ef;border-bottom:1px solid var(--line);padding:5px 6px 0;gap:3px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .tabs-nav::-webkit-scrollbar{display:none}
+    .tab-btn{border:0;background:transparent;color:var(--muted);padding:8px 11px;font-size:11.5px;font-weight:600;border-top-left-radius:7px;border-top-right-radius:7px;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s;flex-shrink:0;min-height:38px}
+    .tab-btn:hover{color:var(--ink);background:#edebe4}
+    .tab-btn.active{color:var(--green);background:#fffefa;box-shadow:0 -2px 0 var(--green) inset, 0 1px 0 #fffefa}
+    .tab-btn .badge-dot{width:6px;height:6px;border-radius:50%;background:#b3b8b4}
+    .tab-btn.active .badge-dot{background:var(--green)}
+    
+    /* Tab Contents */
+    .tab-pane{display:none;padding:18px}
+    .tab-pane.active{display:block}
+    
+    .section-head{margin-bottom:14px}
+    .section-head h2{font-size:13px;margin:0 0 3px;font-weight:700;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px}
+    .section-head p{margin:0;font-size:11px;color:var(--muted)}
+    
+    /* Mode Pill Notice */
+    .pure-mode-banner{background:#f1f7f3;border:1px solid var(--green-border);border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:11.5px;color:var(--green);display:flex;align-items:flex-start;gap:10px}
+    .pure-mode-banner strong{display:block;font-size:12px;color:var(--green-hover);margin-bottom:2px}
+    
+    /* Dropzone */
+    .dropzone{min-height:110px;border:1.5px dashed #c0c6be;background:#fafbf8;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer;transition:.15s;padding:14px 10px}
+    .dropzone:hover,.dropzone.dragover{background:#f0f5f1;border-color:var(--green)}
+    .upload-icon{width:32px;height:32px;border-radius:8px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;margin-bottom:6px;font-size:16px}
+    .dropzone strong{font-size:12px;color:var(--ink)}
+    .dropzone span{font-size:10.5px;color:var(--muted);margin-top:2px}
+    
+    .file-info{display:none;margin-top:12px;background:#f7f8f4;border:1px solid #e1e4de;border-radius:8px;padding:9px 12px;align-items:center;justify-content:space-between;font-size:11px;gap:8px}
+    .file-info.visible{display:flex}
+    .file-pill{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+    .file-pill-tag{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--green-soft);color:var(--green);text-transform:uppercase;flex-shrink:0}
+    .file-name{font-weight:600;min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .text-button{border:0;background:none;color:var(--red);font-size:11px;font-weight:600;padding:4px;flex-shrink:0}
+    
+    /* Library Quick Selector */
+    .library-box{margin-top:14px;background:#fbfbf8;border:1px solid var(--line);border-radius:9px;padding:12px}
+    .library-box label{display:block;font-size:11px;font-weight:700;color:var(--ink-soft);margin-bottom:6px}
+    .library-select-row{display:flex;gap:8px;align-items:center}
+    .library-select{flex:1;min-width:0;height:36px;border:1px solid #d3d5ce;border-radius:6px;background:#fff;padding:0 10px;font-size:11.5px;color:var(--ink)}
+    
+    /* Form fields */
+    .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field{min-width:0}
+    .field.full{grid-column:1/-1}
+    .field label{display:flex;justify-content:space-between;align-items:center;color:var(--ink-soft);font-size:10.5px;font-weight:600;margin:0 0 5px;flex-wrap:wrap;gap:2px}
+    .field label span{color:var(--muted);font-weight:400}
+    .field input,.field select,.field textarea{width:100%;height:36px;padding:0 10px;background:#fff;border:1px solid #d8dad2;border-radius:6px;color:var(--ink);font-size:12px;transition:border-color .15s}
+    .field textarea{height:68px;padding:8px 10px;line-height:1.4;resize:vertical}
+    .field input:hover,.field select:hover,.field textarea:hover{border-color:#b8bcb4}
+    
+    /* Option Cards & Toggles */
+    .option-card{background:#fafaf7;border:1px solid var(--line);border-radius:8px;padding:11px 12px;margin-bottom:9px}
+    .toggle-row{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink);gap:12px}
+    .toggle-row-copy{flex:1;min-width:0}
+    .toggle-row-copy strong{display:block;font-size:11.5px;color:var(--ink);line-height:1.3}
+    .toggle-row-copy span{display:block;font-size:10px;color:var(--muted);margin-top:2px;line-height:1.35}
+    .toggle{position:relative;width:34px;height:19px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle span{position:absolute;inset:0;border-radius:20px;background:#d3d6ce;transition:.15s;cursor:pointer}
+    .toggle span:before{content:"";position:absolute;width:15px;height:15px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.15s;box-shadow:0 1px 3px #0003}
+    .toggle input:checked+span{background:var(--green)}
+    .toggle input:checked+span:before{transform:translateX(15px)}
+    
+    /* Presets */
+    .preset-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+    .preset{border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink-soft);padding:6px 10px;font-size:11px;font-weight:550;transition:.15s;min-height:32px;display:inline-flex;align-items:center;justify-content:center}
+    .preset:hover{border-color:#b5bdb7}
+    .preset.active{border-color:var(--green-border);color:var(--green);background:var(--green-soft);font-weight:700}
+    
+    /* Audit Box */
+    .audit-box{background:#f8f9f6;border:1px solid #d8ddd6;border-radius:8px;padding:12px;margin-top:14px;font-size:11px;line-height:1.5}
+    .audit-title{font-weight:700;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .audit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .audit-metric{background:#fff;border:1px solid #e1e5de;border-radius:6px;padding:6px 8px}
+    .audit-metric small{display:block;color:var(--muted);font-size:9.5px;text-transform:uppercase}
+    .audit-metric strong{display:block;font-size:13px;color:var(--ink);margin-top:2px}
+    
+    /* Preview Panel */
+    .preview-panel{display:flex;flex-direction:column;min-width:0;background:#fffefa;width:100%}
+    .preview-toolbar{padding:8px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:#fffefa;gap:8px;flex-wrap:wrap;box-sizing:border-box}
+    .preview-toolbar-row{display:flex;align-items:center;gap:8px}
+    .preview-view-mode{display:flex;background:#edece6;padding:2px;border-radius:7px;gap:2px;flex-shrink:0}
+    .view-btn{border:0;background:transparent;color:var(--ink-soft);font-size:11px;font-weight:600;padding:5px 9px;border-radius:5px;transition:.15s;min-height:30px;white-space:nowrap}
+    .view-btn.active{background:#fff;color:var(--green);box-shadow:0 1px 3px #0001}
+    .preview-section-select{height:32px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:0 8px;font-size:11px;color:var(--ink);max-width:210px}
+    
+    .page-nav-group{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft)}
+    .mini-btn{height:30px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+    .mini-btn:hover{background:#f6f6f2}
+    .mini-btn:disabled{opacity:.35;cursor:not-allowed}
+    .page-indicator-badge{padding:4px 9px;background:#f3f3ee;border-radius:5px;font-weight:600;font-size:11px;white-space:nowrap}
+    
+    .zoom-controls{display:flex;align-items:center;gap:2px;background:#edece6;padding:2px;border-radius:6px;flex-shrink:0}
+    .zoom-btn{border:0;background:transparent;color:var(--ink-soft);padding:3px 7px;font-size:11px;font-weight:700;border-radius:4px;min-height:26px}
+    .zoom-btn:hover{background:#fff;color:var(--ink)}
+
+    /* Preview Canvas Area */
+    .preview-area{background:#e3e2db;min-height:680px;padding:28px 14px;display:flex;justify-content:center;align-items:flex-start;overflow:auto;-webkit-overflow-scrolling:touch;width:100%;box-sizing:border-box}
+    
+    /* Book Container - Spread Mode */
+    .book-spread-wrap{transition:transform .15s ease-out;transform-origin:top center;max-width:100%;display:flex;justify-content:center}
+    .book-spread{display:flex;box-shadow:0 18px 44px #1c1d1828;border-radius:2px;background:#fbf9f4;position:relative}
+    .book-spread:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:22px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.16) 35%,rgba(0,0,0,.22) 50%,rgba(0,0,0,.16) 65%,rgba(0,0,0,.06) 100%);pointer-events:none;z-index:15}
+    
+    /* Book Pages */
+    .page-sheet{background:var(--paper);width:clamp(280px, 24vw, 375px);height:auto;aspect-ratio:var(--page-aspect, 6/9);position:relative;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;transition:background-color .2s}
+    .page-sheet.cream{background:var(--paper-cream)}
+    .page-sheet.page-left{border-top-left-radius:3px;border-bottom-left-radius:3px;box-shadow:inset -12px 0 16px -8px #0000001c}
+    .page-sheet.page-right{border-top-right-radius:3px;border-bottom-right-radius:3px;box-shadow:inset 12px 0 16px -8px #0000001c}
+    
+    /* Single page mode */
+    .book-spread.single-mode{box-shadow:none;background:transparent;width:100%;max-width:440px;margin:0 auto}
+    .book-spread.single-mode .page-left{display:none}
+    .book-spread.single-mode:after{display:none}
+    .book-spread.single-mode .page-right{border-radius:4px;width:100%;max-width:420px;height:auto;aspect-ratio:var(--page-aspect, 6/9);box-shadow:0 14px 38px #00000022;margin:0 auto}
+    
+    /* Running headers and footers */
+    .page-header{height:20px;display:flex;justify-content:space-between;align-items:center;font-family:'EB Garamond',Georgia,serif;font-size:9.5px;color:#787b77;letter-spacing:.08em;text-transform:uppercase;border-bottom:.5px solid #dedcd4;margin-bottom:10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex-shrink:0}
+    .page-footer{height:20px;display:flex;justify-content:center;align-items:center;font-family:'EB Garamond',Georgia,serif;font-size:9.5px;color:#858883;margin-top:auto;flex-shrink:0}
+    .page-sheet.page-left .page-footer{justify-content:flex-start}
+    .page-sheet.page-right .page-footer{justify-content:flex-end}
+    
+    /* Book Content */
+    .page-body{flex:1;overflow:hidden;font-family:'EB Garamond',Georgia,serif;color:#181a18;text-align:justify;line-height:1.42;font-size:11px}
+    .page-body h1{font-size:16px;text-align:center;font-weight:normal;letter-spacing:.08em;text-transform:uppercase;margin:22% 0 14px;line-height:1.25}
+    .page-body h2{font-size:13px;text-align:center;font-weight:normal;letter-spacing:.06em;text-transform:uppercase;margin:14% 0 10px;line-height:1.25}
+    .page-body h3{font-size:11.5px;text-align:center;font-weight:normal;letter-spacing:.04em;text-transform:uppercase;margin:12px 0 8px}
+    .page-body p{margin:0;text-indent:1.5em;line-height:1.42;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+    .page-body h1+p, .page-body h2+p, .page-body h3+p{text-indent:0}
+    .page-body p.align-right{text-align:right;font-style:italic;text-indent:0;margin:.4em 0}
+    .page-body p.v{text-align:left;text-indent:0;padding-left:2em}
+    .page-body p.stanza-break{margin:0;height:.75em;text-indent:0}
+    
+    /* Title Page Template */
+    .tpl-title-page{height:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:12% 4%}
+    .tpl-publisher-mark{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:#80847f}
+    .tpl-author{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#333633}
+    .tpl-book-title{font-size:22px;line-height:1.18;font-weight:700;letter-spacing:.02em;margin:10px 0 6px;color:#141614}
+    .tpl-book-subtitle{font-size:12px;font-style:italic;color:#666a65}
+    .tpl-editor{font-size:10.5px;color:#555a55;margin-top:12px}
+    .tpl-year{font-size:11px;color:#777b76}
+    
+    /* Verso / Legal Page Template */
+    .tpl-legal-page{height:100%;display:flex;flex-direction:column;justify-content:flex-end;font-size:9.5px;line-height:1.5;color:#555955}
+    .tpl-legal-page p{margin:0 0 7px;text-indent:0}
+    .tpl-legal-page strong{color:#222522}
+    
+    /* Table of contents template */
+    .tpl-toc{font-size:10.5px}
+    .tpl-toc h3{text-align:center;font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 16px;font-weight:normal}
+    .toc-item{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;border-bottom:1px dotted #ccc}
+    .toc-item span:first-child{background:inherit;padding-right:4px}
+    .toc-item span:last-child{background:inherit;padding-left:4px}
+    
+    /* Empty state */
+    .empty-state{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:#858983;font-size:11.5px;padding:24px}
+    .empty-book-icon{font:40px 'EB Garamond',Georgia,serif;color:#c0c4bb;margin-bottom:8px}
+    
+    /* Preview Footer */
+    .preview-foot{min-height:44px;border-top:1px solid var(--line);padding:8px 18px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:11px;background:#fffefa;flex-wrap:wrap;gap:6px}
+    .preview-foot strong{color:var(--ink-soft);font-weight:600}
+    .kdp-check{display:flex;align-items:center;gap:6px}
+    .kdp-check:before{content:"";width:7px;height:7px;border-radius:50%;background:#4ca66d;flex-shrink:0}
+    
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#222623;color:#fff;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:500;opacity:0;transition:.2s;pointer-events:none;z-index:100;box-shadow:0 6px 20px #0004;display:flex;align-items:center;gap:8px;max-width:90vw;text-align:center}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    
+    /* Modal KDP Sheet */
+    .modal-overlay{position:fixed;inset:0;background:#00000066;backdrop-filter:blur(2px);display:none;place-items:center;z-index:90;padding:16px}
+    .modal-overlay.open{display:grid}
+    .modal-card{background:#fff;border-radius:12px;max-width:680px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 50px #00000033;overflow:hidden}
+    .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .modal-head h3{margin:0;font-size:14.5px;font-weight:700}
+    .modal-body{padding:18px;overflow-y:auto;font-size:12px;line-height:1.5}
+    .modal-close{border:0;background:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px}
+    .kdp-copy-box{background:#f8f9f6;border:1px solid #d8ddd5;border-radius:8px;padding:12px;margin-bottom:14px;position:relative}
+    .kdp-copy-box pre{margin:0;white-space:pre-wrap;font-family:inherit;font-size:11px;color:var(--ink);max-height:180px;overflow-y:auto;word-break:break-word}
+    .copy-btn{position:absolute;top:8px;right:8px;padding:5px 9px;font-size:10.5px;font-weight:600;background:#fff;border:1px solid #c7cdc5;border-radius:5px}
+    .copy-btn:hover{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+    
+    .hidden{display:none!important}
+
+    /* Fixed Mobile Navigation Bar */
+    .mobile-nav-bar{display:none}
+    
+    /* RESPONSIVE BREAKPOINTS */
+    @media(max-width:1180px){
+      .workspace{grid-template-columns:390px minmax(0,1fr);gap:16px}
+      .shell{padding:18px 20px 40px}
+      .top-meta .kdp-stat.highlight{display:none}
+    }
+    
+    @media(max-width:920px){
+      .topbar{padding:0 16px;height:56px}
+      .top-meta{display:none}
+      .mobile-kdp-strip{
+        display:flex;
+        gap:6px;
+        overflow-x:auto;
+        padding:4px 0 10px;
+        margin-bottom:10px;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+        width:100%;
+      }
+      .mobile-kdp-strip::-webkit-scrollbar{display:none}
+      .mobile-kdp-strip .kdp-stat{flex-shrink:0}
+      .workspace{grid-template-columns:1fr;gap:18px}
+      .shell{padding:14px 14px 76px}
+      
+      .btn-text-full{display:none}
+      .btn-text-short{display:inline}
+      .button{padding:7px 9px;font-size:11px}
+      
+      .preview-toolbar{
+        flex-direction:column;
+        align-items:stretch;
+        height:auto;
+        padding:10px 12px;
+        gap:8px;
+      }
+      .preview-toolbar-row{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        width:100%;
+        gap:8px;
+      }
+      .preview-section-select{flex:1;min-width:0;max-width:none;height:34px}
+      
+      .preview-area{min-height:520px;padding:20px 8px}
+      
+      /* Mobile bottom nav */
+      .mobile-nav-bar{
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr;
+        align-items:center;
+        position:fixed;
+        bottom:0;
+        left:0;
+        right:0;
+        height:52px;
+        background:rgba(255,254,250,.96);
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+        border-top:1px solid var(--line);
+        z-index:45;
+        padding:0 6px;
+        box-shadow:0 -4px 16px #0000000c;
+      }
+      .mobile-nav-tab{
+        border:0;
+        background:transparent;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:2px;
+        color:var(--muted);
+        font-size:10px;
+        font-weight:600;
+        height:42px;
+        border-radius:8px;
+        cursor:pointer;
+        position:relative;
+        transition:all .15s;
+      }
+      .mobile-nav-tab.active{
+        color:var(--green);
+        background:var(--green-soft);
+      }
+      .mobile-nav-tab.primary{
+        color:#fff;
+        background:var(--green);
+      }
+      .mobile-nav-tab.primary:disabled{
+        opacity:.4;
+        cursor:not-allowed;
+      }
+      .mobile-tab-icon{font-size:14px;line-height:1}
+      .mobile-tab-badge{
+        position:absolute;
+        top:2px;
+        right:8px;
+        font-size:8px;
+        background:var(--green);
+        color:#fff;
+        border-radius:10px;
+        padding:1px 4px;
+        font-weight:700;
+      }
+      .mobile-nav-tab.active .mobile-tab-badge{
+        background:var(--green-hover);
+      }
+    }
+    
+    @media(max-width:620px){
+      .topbar{padding:0 10px;height:52px}
+      .brand{gap:8px;font-size:15px}
+      .brand-mark{width:28px;height:28px;font-size:17px;border-radius:7px}
+      .brand-copy small{display:none}
+      .top-actions{gap:4px}
+      .button{padding:6px 8px;font-size:10.5px;min-height:30px}
+      
+      .header-intro{margin-bottom:12px}
+      .header-intro h1{font-size:21px;line-height:1.2}
+      
+      .fields{grid-template-columns:1fr;gap:10px}
+      .field input,.field select,.field textarea{height:38px;font-size:12.5px}
+      .field textarea{height:72px}
+      
+      .tab-pane{padding:14px 12px}
+      .tab-btn{padding:7px 9px;font-size:11px;min-height:36px}
+      
+      .preset-row{gap:4px}
+      .preset{padding:5px 8px;font-size:10.5px}
+      
+      .audit-grid{grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:6px}
+      
+      .preview-foot{flex-direction:column;align-items:flex-start;height:auto;padding:8px 12px;gap:3px;font-size:10px}
+      
+      .book-spread.single-mode .page-right{max-width:100%}
+      .book-spread:not(.single-mode){min-width:560px}
+    }
+    
+    @media(max-width:380px){
+      .topbar{padding:0 6px}
+      .brand-copy span{font-size:13.5px}
+      .top-actions .button{padding:5px 6px;font-size:10px}
+      .audit-grid{grid-template-columns:1fr}
+      .preview-view-mode .view-btn{padding:4px 6px;font-size:10px}
+    }
+    
+    /* PRINT STYLES - Direct KDP Ready PDF Output */
+    @media print{
+      .topbar,.header-intro,.panel.controls,.preview-toolbar,.preview-foot,.modal-overlay,.toast,.mobile-nav-bar,.mobile-kdp-strip{display:none!important}
+      body,.app,.shell,.workspace,.preview-panel,.preview-area,.book-spread-wrap{margin:0!important;padding:0!important;background:white!important;box-shadow:none!important}
+      .book-spread{box-shadow:none!important;margin:0!important;display:block!important}
+      .book-spread:after{display:none!important}
+      .page-sheet{border:none!important;box-shadow:none!important;background:white!important;width:100%!important;height:auto!important;padding:0!important}
+      @page{
+        size: 6in 9in;
+        margin-top: 18mm;
+        margin-bottom: 18mm;
+      }
+      @page :left{
+        margin-left: 16mm;
+        margin-right: 18mm;
+      }
+      @page :right{
+        margin-left: 18mm;
+        margin-right: 16mm;
+      }
+    }
   </style>
 </head>
 <body>
 <div class="app">
+  <!-- Topbar -->
   <header class="topbar">
-    <div class="brand"><div class="brand-mark">E</div><div>EditSphere<small>Atelier du livre</small></div></div>
-    <div class="top-actions"><span class="save-indicator" id="saveIndicator">Réglages enregistrés</span><button class="button" id="resetButton" type="button">Réinitialiser</button><button class="button primary" id="exportButton" type="button" disabled>Exporter le HTML&nbsp; ↗</button></div>
-  </header>
-  <main class="shell">
-    <div class="intro">
-      <div><div class="eyebrow">Préparation d’un livre · Impression</div><h1>Votre intérieur, à votre façon.</h1><p>Importez votre livre, réglez la mise en page et vérifiez le résultat.</p></div>
-      <div class="stepper"><span class="step active">1</span><span>Importer</span><i class="step-line"></i><span class="step" id="step2">2</span><span>Personnaliser</span><i class="step-line"></i><span class="step" id="step3">3</span><span>Exporter</span></div>
+    <div class="brand">
+      <div class="brand-mark">E</div>
+      <div class="brand-copy">
+        <span>EditSphere</span>
+        <small>Texte Intégral Pur · KDP Broché</small>
+      </div>
     </div>
+    <div class="top-meta" id="topMeta">
+      <div class="kdp-stat highlight">✓ 0 Note · 0 TOC Source</div>
+      <div class="kdp-stat">Format : <strong id="topTrimBadge">6 × 9 po</strong></div>
+      <div class="kdp-stat">Pages : <strong id="topPagesBadge">0 p.</strong></div>
+      <div class="kdp-stat">Dos KDP : <strong id="topSpineBadge">0,0 mm</strong></div>
+    </div>
+    <div class="top-actions">
+      <button class="button" id="resetBtn" type="button" title="Réinitialiser tous les réglages">
+        <span class="btn-text-full">Réinitialiser</span>
+        <span class="btn-text-short">↺</span>
+      </button>
+      <button class="button secondary" id="kdpSheetBtn" type="button" title="Fiche KDP & 4e de couverture">
+        <span class="btn-text-full">📋 Fiche KDP</span>
+        <span class="btn-text-short">📋 Fiche</span>
+      </button>
+      <button class="button secondary" id="printPdfBtn" type="button" title="Imprimer ou enregistrer en PDF KDP">
+        <span class="btn-text-full">🖨️ Imprimer en PDF</span>
+        <span class="btn-text-short">🖨️ PDF</span>
+      </button>
+      <button class="button primary" id="exportHtmlBtn" type="button" disabled title="Exporter votre édition KDP">
+        <span class="btn-text-full">Exporter HTML KDP ↗</span>
+        <span class="btn-text-short">Exporter ↗</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Shell -->
+  <main class="shell">
+    <div class="header-intro">
+      <div>
+        <div class="kicker">Broché Amazon KDP · Extraction Texte Pur</div>
+        <h1>Atelier d’édition et mise en page brochée</h1>
+        <p>Purger toutes les métadonnées, notes, annotations et anciennes tables des matières pour extraire uniquement le texte pur de l’œuvre, habillé de vos propres métadonnées.</p>
+      </div>
+    </div>
+
+    <!-- Mobile KDP Status Strip -->
+    <div class="mobile-kdp-strip" id="mobileKdpStrip">
+      <div class="kdp-stat highlight">✓ Texte Pur</div>
+      <div class="kdp-stat">Format : <strong id="topTrimBadgeMobile">6 × 9 po</strong></div>
+      <div class="kdp-stat">Pages : <strong id="topPagesBadgeMobile">0 p.</strong></div>
+      <div class="kdp-stat">Dos KDP : <strong id="topSpineBadgeMobile">0,0 mm</strong></div>
+    </div>
+
+    <!-- Workspace -->
     <div class="workspace">
-      <aside class="panel controls">
-        <div class="panel-head"><h2>Réglages du livre</h2><span>Modifications enregistrées automatiquement</span></div>
-        <section class="section">
-          <div class="section-title"><span>01 &nbsp; Votre manuscrit</span><em>Fichier HTML</em></div>
-          <label class="dropzone" id="dropzone" for="fileInput"><span class="upload-icon">↑</span><strong>Déposer votre fichier ici</strong><span>ou parcourir vos fichiers · .html</span></label>
-          <input class="hidden" id="fileInput" type="file" accept=".html,.htm,text/html">
-          <div class="file-info" id="fileInfo"><strong id="fileName"></strong><button class="text-button" id="removeFile" type="button">Retirer</button></div>
-        </section>
-        <section class="section" id="cleanSection">
-          <div class="section-title"><span>02 &nbsp; Nettoyer le HTML</span><em>Avant la mise en page</em></div>
-          <p style="margin:-3px 0 11px;color:#777c78;font-size:10px">Supprime les éléments web et Word inutiles, garde le texte et prépare une structure propre pour l’impression.</p>
-          <button class="button primary" id="cleanButton" type="button" disabled style="width:100%">Nettoyer le HTML</button>
-          <div id="cleanReport" style="margin-top:9px;color:#858982;font-size:10px;line-height:1.5" aria-live="polite">Importez un manuscrit pour lancer le nettoyage.</div>
-        </section>
-        <section class="section">
-          <div class="section-title"><span>03 &nbsp; Informations du livre</span><em>Personnalisable</em></div>
+      <!-- Controls Panel -->
+      <aside class="panel controls" id="controlsPanel">
+        <nav class="tabs-nav" role="tablist">
+          <button class="tab-btn active" data-tab="tab-source" type="button"><span class="badge-dot"></span>01. Manuscrit</button>
+          <button class="tab-btn" data-tab="tab-clean" type="button"><span class="badge-dot"></span>02. Extraction Pure</button>
+          <button class="tab-btn" data-tab="tab-metadata" type="button"><span class="badge-dot"></span>03. Mes Métadonnées</button>
+          <button class="tab-btn" data-tab="tab-layout" type="button"><span class="badge-dot"></span>04. Format & Dos</button>
+          <button class="tab-btn" data-tab="tab-typo" type="button"><span class="badge-dot"></span>05. Typographie</button>
+        </nav>
+
+        <!-- TAB 1: Source & Import -->
+        <div class="tab-pane active" id="tab-source">
+          <div class="section-head">
+            <h2>Fichier source d'origine <em>.epub · .html · .mht</em></h2>
+            <p>Glissez-déposez votre livre d'origine ou chargez un exemple du domaine public.</p>
+          </div>
+
+          <label class="dropzone" id="dropzone" for="fileInput">
+            <span class="upload-icon">↑</span>
+            <strong>Déposer un fichier .epub, .html ou .mht</strong>
+            <span>Glisser-déposer ou parcourir vos dossiers</span>
+          </label>
+          <input class="hidden" id="fileInput" type="file" accept=".epub,.html,.htm,.mht,.mhtml,application/epub+zip,text/html">
+
+          <div class="file-info" id="fileInfo">
+            <div class="file-pill">
+              <span class="file-pill-tag" id="fileFormatTag">HTML</span>
+              <span class="file-name" id="fileName">Aucun fichier</span>
+            </div>
+            <button class="text-button" id="removeFileBtn" type="button">Retirer</button>
+          </div>
+
+          <div class="library-box">
+            <label for="bundledBooksSelect">📚 Charger un chef-d'œuvre de la bibliothèque intégrée :</label>
+            <div class="library-select-row">
+              <select class="library-select" id="bundledBooksSelect">
+                <option value="">Chargement de la bibliothèque...</option>
+              </select>
+              <button class="button" id="loadBundledBtn" type="button">Ouvrir</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Pure Text Extraction Engine -->
+        <div class="tab-pane" id="tab-clean">
+          <div class="pure-mode-banner">
+            <span style="font-size:18px">🧹</span>
+            <div>
+              <strong>Mode Extraction : Texte Intégral Pur</strong>
+              Toutes les données du site d'origine (pages de titre tiers, photos, avertissements, anciennes tables des matières, notes, annotations de correcteurs et renvois) sont systématiquement supprimées. Seul le texte de l'œuvre est conservé.
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Retirer toutes les notes et annotations</strong>
+                <span>Supprime 100% des notes (auteur, éditeur, critiques) et purge tous les renvois dans le texte (<code>[1]</code>, <code>[2]</code>, etc.).</span>
+              </div>
+              <label class="toggle"><input id="optPurgeAllNotes" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Retirer les tables des matières d'origine</strong>
+                <span>Élimine les anciens sommaires web/Word et leurs liens morts.</span>
+              </div>
+              <label class="toggle"><input id="optPurgeSourceToc" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Purger les mentions et pages du site d'origine</strong>
+                <span>Retire couvertures d'origine, mentions « Ebooks libres et gratuits », « Guy Rosa », licences tiers et pages « À propos ».</span>
+              </div>
+              <label class="toggle"><input id="optPurgeSourceFrontMatter" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Typographie littéraire soignée</strong>
+                <span>Espaces insécables devant <code>: ; ! ? »</code> et après <code>«</code>, apostrophes courbes <code>’</code> et tirets cadratins <code>—</code>.</span>
+              </div>
+              <label class="toggle"><input id="optFrenchSpacing" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Composer la poésie et le théâtre en vers</strong>
+                <span>Détecte les strophes pour les composer alignées à gauche avec retrait, sans étirement de justification.</span>
+              </div>
+              <label class="toggle"><input id="optDetectVerse" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <button class="button primary" id="cleanActionBtn" type="button" style="width:100%;margin-top:6px" disabled>
+            ✨ Relancer l'extraction du texte pur
+          </button>
+
+          <div class="audit-box" id="auditBox">
+            <div class="audit-title">Rapport d'épuration & intégrité du texte pur</div>
+            <div id="auditStatus">En attente d'un manuscrit pour l'analyse.</div>
+            <div class="audit-grid hidden" id="auditGrid">
+              <div class="audit-metric"><small>Mots de texte pur extrait</small><strong id="metricWords">0</strong></div>
+              <div class="audit-metric"><small>Notes & renvois éliminés</small><strong id="metricNotesRemoved">0</strong></div>
+              <div class="audit-metric"><small>TOC d'origine supprimées</small><strong id="metricTocRemoved">0</strong></div>
+              <div class="audit-metric"><small>Pages source éliminées</small><strong id="metricFrontMatterRemoved">0</strong></div>
+              <div class="audit-metric"><small>Balises web purgées</small><strong id="metricWebCleaned">0</strong></div>
+              <div class="audit-metric"><small>Vers poétiques préservés</small><strong id="metricVerses">0</strong></div>
+            </div>
+            <div style="margin-top:10px" class="hidden" id="auditActionRow">
+              <button class="button" id="downloadAuditBtn" type="button" style="font-size:11px;padding:4px 9px">Télécharger le rapport d'audit (.txt)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Publisher Metadata Regeneration -->
+        <div class="tab-pane" id="tab-metadata">
+          <div class="section-head">
+            <h2>Mes Nouvelles Métadonnées Éditeur</h2>
+            <p>Ces métadonnées remplaceront intégralement toutes les anciennes données du livre.</p>
+          </div>
+
           <div class="fields">
-            <div class="field full"><label for="bookTitle">Titre du livre</label><input id="bookTitle" type="text" placeholder="Ex. Les Contemplations"></div>
-            <div class="field"><label for="author">Auteur</label><input id="author" type="text" placeholder="Nom de l’auteur"></div>
-            <div class="field"><label for="year">Année</label><input id="year" type="text" placeholder="Ex. 1856"></div>
+            <div class="field full">
+              <label for="metaPublisher">Nom de l'Éditeur / Maison d'édition <span>(Imprint)</span></label>
+              <input id="metaPublisher" type="text" placeholder="Ex. Éditions du Siècle ou Atelier Weblocalis" value="Éditions EditSphere">
+            </div>
+            <div class="field full">
+              <label for="metaCollection">Nom de la Collection <span>(Optionnel)</span></label>
+              <input id="metaCollection" type="text" placeholder="Ex. Les Grands Classiques du Domaine Public" value="Collection Les Grands Textes">
+            </div>
+            <div class="field full">
+              <label for="metaBookTitle">Titre de l'Œuvre</label>
+              <input id="metaBookTitle" type="text" placeholder="Ex. Notre-Dame de Paris">
+            </div>
+            <div class="field full">
+              <label for="metaBookSubtitle">Sous-titre / Complément de titre</label>
+              <input id="metaBookSubtitle" type="text" placeholder="Ex. 1482 — Texte intégral">
+            </div>
+            <div class="field">
+              <label for="metaAuthor">Auteur Original</label>
+              <input id="metaAuthor" type="text" placeholder="Ex. Victor Hugo">
+            </div>
+            <div class="field">
+              <label for="metaEditor">Édition / Préface par</label>
+              <input id="metaEditor" type="text" placeholder="Ex. Édition établie par l'Atelier">
+            </div>
+            <div class="field">
+              <label for="metaOriginalYear">Année de parution originale</label>
+              <input id="metaOriginalYear" type="text" placeholder="Ex. 1831">
+            </div>
+            <div class="field">
+              <label for="metaPubYear">Année de cette édition</label>
+              <input id="metaPubYear" type="text" placeholder="Ex. 2026" value="2026">
+            </div>
+            <div class="field full">
+              <label for="metaIsbn">Numéro ISBN-13 broché <span id="isbnStatusBadge">Validation auto</span></label>
+              <input id="metaIsbn" type="text" placeholder="979-10-00000-00-0" value="979-10-98765-43-2">
+            </div>
+            <div class="field">
+              <label for="metaDepotLegal">Dépôt légal</label>
+              <input id="metaDepotLegal" type="text" placeholder="Ex. Novembre 2026" value="4e trimestre 2026">
+            </div>
+            <div class="field">
+              <label for="metaCity">Ville / Pays</label>
+              <input id="metaCity" type="text" placeholder="Ex. Paris, France" value="Paris">
+            </div>
+            <div class="field full">
+              <label for="metaPublicDomainText">Déclaration Domaine Public & Mentions Légales</label>
+              <textarea id="metaPublicDomainText">La présente œuvre relève du domaine public selon le Code de la propriété intellectuelle. La composition typographique, les éléments paratextuels et la mise en page sont la propriété exclusive de l'éditeur.</textarea>
+            </div>
           </div>
-        </section>
-        <section class="section">
-          <div class="section-title"><span>04 &nbsp; Format et marges</span><em>Intérieur papier</em></div>
-          <div class="preset-row" role="group" aria-label="Formats prédéfinis"><button type="button" class="preset active" data-size="6x9">Roman · 6 × 9</button><button type="button" class="preset" data-size="5.5x8.5">Compact · 5,5 × 8,5</button><button type="button" class="preset" data-size="a5">A5</button></div>
-          <div class="details">
-            <div class="field"><label for="pageWidth">Largeur (pouces)</label><input id="pageWidth" type="number" min="4" max="8.5" step="0.1" value="6"></div>
-            <div class="field"><label for="pageHeight">Hauteur (pouces)</label><input id="pageHeight" type="number" min="6" max="11.7" step="0.1" value="9"></div>
-            <div class="field"><label for="marginTop">Haut (mm)</label><input id="marginTop" type="number" min="6" max="40" value="20"></div>
-            <div class="field"><label for="marginBottom">Bas (mm)</label><input id="marginBottom" type="number" min="6" max="40" value="20"></div>
-            <div class="field"><label for="marginInside">Reliure (mm)</label><input id="marginInside" type="number" min="6" max="40" value="22"></div>
-            <div class="field"><label for="marginOutside">Extérieur (mm)</label><input id="marginOutside" type="number" min="6" max="40" value="16"></div>
+        </div>
+
+        <!-- TAB 4: Format, Margins & KDP Spine -->
+        <div class="tab-pane" id="tab-layout">
+          <div class="section-head">
+            <h2>Format Broché KDP & Épaisseur du Dos</h2>
+            <p>Spécifications de reliure conformes aux règles de production Amazon KDP.</p>
           </div>
-        </section>
-        <section class="section">
-          <div class="section-title"><span>05 &nbsp; Typographie</span><em>Corps du texte</em></div>
-          <div class="details">
-            <div class="field"><label for="fontFamily">Police</label><select id="fontFamily"><option value="Georgia, Garamond, 'Times New Roman', serif">Georgia</option><option value="'Palatino Linotype', Palatino, serif">Palatino</option><option value="'Times New Roman', Times, serif">Times New Roman</option><option value="Garamond, Georgia, serif">Garamond</option></select></div>
-            <div class="field"><label for="fontSize">Taille (pt)</label><input id="fontSize" type="number" min="8" max="16" step="0.5" value="11"></div>
-            <div class="field"><label for="lineHeight">Interligne</label><select id="lineHeight"><option value="1.25">Serré · 1,25</option><option value="1.4">Confort · 1,4</option><option value="1.5" selected>Aéré · 1,5</option><option value="1.6">Très aéré · 1,6</option></select></div>
-            <div class="field"><label for="indent">Alinéa (em)</label><input id="indent" type="number" min="0" max="3" step="0.25" value="1.5"></div>
+
+          <div class="preset-row" role="group" aria-label="Formats KDP">
+            <button type="button" class="preset active" data-size="6x9">Roman · 6 × 9 po</button>
+            <button type="button" class="preset" data-size="5.5x8.5">Digest · 5,5 × 8,5 po</button>
+            <button type="button" class="preset" data-size="5x8">Poche · 5 × 8 po</button>
+            <button type="button" class="preset" data-size="6.14x9.21">Royal · 6,14 × 9,21 po</button>
+            <button type="button" class="preset" data-size="a5">A5 (148 × 210 mm)</button>
           </div>
-          <div class="toggle-row"><span>Justifier les paragraphes</span><label class="toggle"><input id="justify" type="checkbox" checked><span></span></label></div>
-          <div class="toggle-row"><span>Commencer chaque chapitre sur une nouvelle page</span><label class="toggle"><input id="chapterBreak" type="checkbox" checked><span></span></label></div>
-        </section>
-        <div class="notice"><b>À savoir :</b> l’aperçu montre la page de titre et le début du texte. Le fichier exporté contient le livre entier. Vérifiez le résultat final avec l’aperçu avant impression de KDP.</div>
+
+          <div class="fields">
+            <div class="field">
+              <label for="pageWidth">Largeur (pouces)</label>
+              <input id="pageWidth" type="number" min="4" max="8.5" step="0.01" value="6">
+            </div>
+            <div class="field">
+              <label for="pageHeight">Hauteur (pouces)</label>
+              <input id="pageHeight" type="number" min="6" max="11.7" step="0.01" value="9">
+            </div>
+            <div class="field">
+              <label for="marginInside">Petit fond / Reliure (mm) <span id="gutterKdpMin">Min KDP : 12.7 mm</span></label>
+              <input id="marginInside" type="number" min="8" max="45" value="18">
+            </div>
+            <div class="field">
+              <label for="marginOutside">Grand fond / Extérieur (mm)</label>
+              <input id="marginOutside" type="number" min="8" max="35" value="16">
+            </div>
+            <div class="field">
+              <label for="marginTop">Marge supérieure (mm)</label>
+              <input id="marginTop" type="number" min="10" max="35" value="18">
+            </div>
+            <div class="field">
+              <label for="marginBottom">Marge inférieure (mm)</label>
+              <input id="marginBottom" type="number" min="10" max="35" value="18">
+            </div>
+            <div class="field full">
+              <label for="paperColor">Teinte du papier intérieur</label>
+              <select id="paperColor">
+                <option value="cream" selected>Papier Crème (recommandé roman & classique)</option>
+                <option value="white">Papier Blanc (pour manuels ou textes modernes)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="audit-box" style="margin-top:14px">
+            <div class="audit-title">Calculateur de tranche KDP (Spine Width)</div>
+            <div class="audit-grid">
+              <div class="audit-metric"><small>Nombre de pages paginées</small><strong id="calcPagesCount">0 p.</strong></div>
+              <div class="audit-metric"><small>Épaisseur du dos</small><strong id="calcSpineWidth">0,0 mm</strong></div>
+              <div class="audit-metric"><small>Petit fond KDP minimum</small><strong id="calcMinGutter">9,5 mm</strong></div>
+              <div class="audit-metric"><small>Marge confort appliquée</small><strong id="calcGutterComfort">+5,0 mm</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: Typography -->
+        <div class="tab-pane" id="tab-typo">
+          <div class="section-head">
+            <h2>Typographie & Composition</h2>
+            <p>Police EB Garamond intégrée et paramètres de mise en page littéraire.</p>
+          </div>
+
+          <div class="fields">
+            <div class="field full">
+              <label for="fontFamily">Famille de police</label>
+              <select id="fontFamily">
+                <option value="'EB Garamond', Garamond, Georgia, serif" selected>EB Garamond (Police libre haute lisibilité incluse)</option>
+                <option value="'Palatino Linotype', Palatino, serif">Palatino Linotype</option>
+                <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                <option value="Georgia, serif">Georgia</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="fontSize">Corps du texte (pt)</label>
+              <input id="fontSize" type="number" min="8.5" max="14" step="0.5" value="10.5">
+            </div>
+            <div class="field">
+              <label for="lineHeight">Interligne</label>
+              <select id="lineHeight">
+                <option value="1.3">Dense · 1,30</option>
+                <option value="1.4" selected>Confort · 1,40</option>
+                <option value="1.5">Aéré · 1,50</option>
+                <option value="1.6">Très aéré · 1,60</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="indent">Alinéa (em)</label>
+              <input id="indent" type="number" min="0" max="3" step="0.25" value="1.5">
+            </div>
+            <div class="field">
+              <label for="headerStyle">Titres courants</label>
+              <select id="headerStyle">
+                <option value="both" selected>Livre à gauche · Chapitre à droite</option>
+                <option value="titleOnly">Titre du livre uniquement</option>
+                <option value="none">Aucun titre courant</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="option-card" style="margin-top:14px">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Justifier les paragraphes</strong>
+                <span>Composition justifiée avec césures automatiques (hyphens).</span>
+              </div>
+              <label class="toggle"><input id="justify" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Nouvelle page à chaque chapitre</strong>
+                <span>Force chaque titre de chapitre à débuter sur une nouvelle page.</span>
+              </div>
+              <label class="toggle"><input id="chapterBreak" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+
+          <div class="option-card">
+            <div class="toggle-row">
+              <div class="toggle-row-copy">
+                <strong>Générer mon propre sommaire propre</strong>
+                <span>Crée une table des matières basée sur vos chapitres réels (sans aucun lien mort).</span>
+              </div>
+              <label class="toggle"><input id="enableToc" type="checkbox" checked><span></span></label>
+            </div>
+          </div>
+        </div>
       </aside>
-      <section class="panel preview-panel" aria-label="Aperçu du livre">
-        <div class="preview-head"><div class="preview-heading"><h2>Aperçu de l’intérieur</h2><span id="previewLabel">Page de titre</span></div><div class="preview-actions"><button class="icon-button active" id="titleView" type="button">Titre</button><button class="icon-button" id="textView" type="button">Début du texte</button></div></div>
-        <div class="preview-area"><div class="paper-wrap"><div class="book-page" id="bookPage"><div class="book-page-content" id="pageContent"><div class="empty-state"><div class="book-symbol">E</div><strong>Votre aperçu apparaîtra ici</strong><span>Importez un fichier HTML pour commencer.</span></div></div></div></div></div>
-        <div class="preview-foot"><span class="status" id="previewStatus">En attente d’un manuscrit</span><strong id="pageSizeLabel">Format 6 × 9 pouces</strong></div>
+
+      <!-- Preview Panel -->
+      <section class="panel preview-panel" id="previewPanel" aria-label="Aperçu du livre broché">
+        <div class="preview-toolbar" id="previewToolbar">
+          <div class="preview-toolbar-row primary-row">
+            <div class="preview-view-mode">
+              <button class="view-btn active" id="btnSpreadView" type="button" title="Vue double-page (livre ouvert)">📖 Double-Page</button>
+              <button class="view-btn" id="btnSingleView" type="button" title="Vue page simple">📄 Page Simple</button>
+            </div>
+
+            <select class="preview-section-select" id="sectionSelector" aria-label="Accéder directement à une section">
+              <option value="title">1. Faux-titre & Grand Titre</option>
+              <option value="legal">2. Mentions Légales & Verso</option>
+              <option value="toc">3. Mon Nouveau Sommaire</option>
+              <option value="text" selected>4. Texte Intégral Pur (Chapitre 1)</option>
+              <option value="browse">5. Feuilleter l’ouvrage...</option>
+            </select>
+          </div>
+
+          <div class="preview-toolbar-row nav-row">
+            <div class="zoom-controls">
+              <button class="zoom-btn" id="zoomOutBtn" type="button" title="Zoom arrière" aria-label="Zoom arrière">−</button>
+              <button class="zoom-btn" id="zoomResetBtn" type="button" title="Réinitialiser zoom" aria-label="Réinitialiser zoom">100%</button>
+              <button class="zoom-btn" id="zoomInBtn" type="button" title="Zoom avant" aria-label="Zoom avant">+</button>
+            </div>
+
+            <div class="page-nav-group">
+              <button class="mini-btn" id="prevPageBtn" type="button" title="Page précédente (Touche Flèche Gauche)">◀ Préc.</button>
+              <span class="page-indicator-badge" id="pageCounterDisplay">Pages 1 - 2</span>
+              <button class="mini-btn" id="nextPageBtn" type="button" title="Page suivante (Touche Flèche Droite)">Suiv. ▶</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book Display Canvas -->
+        <div class="preview-area">
+          <div class="book-spread-wrap" id="bookSpreadWrap">
+            <div class="book-spread" id="bookSpread">
+              <!-- Left Page (Even / Verso) -->
+              <article class="page-sheet page-left cream" id="pageLeft">
+                <div class="page-header" id="pageLeftHeader">
+                  <span id="pageLeftTitle">TITRE DU LIVRE</span>
+                  <span></span>
+                </div>
+                <div class="page-body" id="pageLeftContent">
+                  <div class="empty-state">
+                    <div class="empty-book-icon">E</div>
+                    <strong>Votre texte intégral pur apparaîtra ici</strong>
+                    <span>Importez un livre : les notes, tables des matières et scories web seront automatiquement purgées.</span>
+                  </div>
+                </div>
+                <div class="page-footer" id="pageLeftFooter">
+                  <span id="pageLeftNum">2</span>
+                </div>
+              </article>
+
+              <!-- Right Page (Odd / Recto) -->
+              <article class="page-sheet page-right cream" id="pageRight">
+                <div class="page-header" id="pageRightHeader">
+                  <span></span>
+                  <span id="pageRightTitle">CHAPITRE I</span>
+                </div>
+                <div class="page-body" id="pageRightContent">
+                  <div class="empty-state">
+                    <div class="empty-book-icon">E</div>
+                    <strong>Aperçu en temps réel</strong>
+                    <span>Visualisez le texte épuré avec vos propres métadonnées d’édition.</span>
+                  </div>
+                </div>
+                <div class="page-footer" id="pageRightFooter">
+                  <span id="pageRightNum">3</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Footer -->
+        <div class="preview-foot">
+          <div class="kdp-check" id="previewKdpStatus">Texte pur paginé · Reliure miroir active</div>
+          <div>Format : <strong id="previewFormatLabel">6 × 9 pouces</strong> · Navigation clavier : <code>←</code> <code>→</code></div>
+        </div>
       </section>
     </div>
-    <div class="quality"><div class="quality-icon">✓</div><div class="quality-copy"><strong>Votre texte reste le vôtre</strong><span>EditSphere applique la mise en page sans réécrire le contenu du livre.</span></div><div class="quality-count" id="qualitySummary">En attente du manuscrit</div></div>
   </main>
 </div>
+
+<!-- Modal: Amazon KDP Listing Toolkit -->
+<div class="modal-overlay" id="kdpModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>📋 Fiche Produit Amazon KDP & 4e de Couverture</h3>
+      <button class="modal-close" id="closeKdpModal" type="button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0;color:var(--muted)">Copiez-collez ces éléments dans votre tableau de bord <a href="https://kdp.amazon.com" target="_blank" style="color:var(--green);font-weight:600">Amazon KDP</a> lors de la création de votre livre broché.</p>
+
+      <label style="font-weight:700;display:block;margin-bottom:4px">Titre & Sous-titre KDP</label>
+      <div class="kdp-copy-box">
+        <button class="copy-btn" data-copy="kdpTitleCopy" type="button">Copier</button>
+        <pre id="kdpTitleCopy"></pre>
+      </div>
+
+      <label style="font-weight:700;display:block;margin-bottom:4px">Description HTML optimisée pour la page produit Amazon (4e de couverture)</label>
+      <div class="kdp-copy-box">
+        <button class="copy-btn" data-copy="kdpDescCopy" type="button">Copier</button>
+        <pre id="kdpDescCopy"></pre>
+      </div>
+
+      <label style="font-weight:700;display:block;margin-bottom:4px">7 Mots-clés KDP recommandés</label>
+      <div class="kdp-copy-box">
+        <button class="copy-btn" data-copy="kdpKeywordsCopy" type="button">Copier</button>
+        <pre id="kdpKeywordsCopy"></pre>
+      </div>
+
+      <label style="font-weight:700;display:block;margin-bottom:4px">Catégories & Déclaration de Domaine Public KDP</label>
+      <div class="kdp-copy-box">
+        <button class="copy-btn" data-copy="kdpCategoriesCopy" type="button">Copier</button>
+        <pre id="kdpCategoriesCopy"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed Mobile Bottom Navigation Bar -->
+<nav class="mobile-nav-bar" id="mobileNavBar" aria-label="Navigation mobile rapide">
+  <button type="button" class="mobile-nav-tab active" id="mobileTabControls">
+    <span class="mobile-tab-icon">⚙️</span>
+    <span class="mobile-tab-label">Réglages</span>
+  </button>
+  <button type="button" class="mobile-nav-tab" id="mobileTabPreview">
+    <span class="mobile-tab-icon">📖</span>
+    <span class="mobile-tab-label">Aperçu</span>
+    <span class="mobile-tab-badge" id="mobileTabCounter">p. 1-2</span>
+  </button>
+  <button type="button" class="mobile-nav-tab primary" id="mobileExportBtn" disabled title="Exporter HTML KDP">
+    <span class="mobile-tab-icon">↗</span>
+    <span class="mobile-tab-label">Exporter</span>
+  </button>
+</nav>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const fields = ['bookTitle','author','year','pageWidth','pageHeight','marginTop','marginBottom','marginInside','marginOutside','fontFamily','fontSize','lineHeight','indent','justify','chapterBreak'];
-  const defaults = {bookTitle:'',author:'',year:'',pageWidth:'6',pageHeight:'9',marginTop:'20',marginBottom:'20',marginInside:'22',marginOutside:'16',fontFamily:"Georgia, Garamond, 'Times New Roman', serif",fontSize:'11',lineHeight:'1.5',indent:'1.5',justify:true,chapterBreak:true};
-  let settings = {...defaults}, sourceHtml = '', sourceName = '', parsedBody = null, parsedTitle = '', parsedAuthor = '', currentView = 'title', toastTimer;
-  const clamp = (value,min,max,fallback) => { const n=Number(value); return Number.isFinite(n)?Math.min(max,Math.max(min,n)):fallback; };
-  const esc = value => String(value||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function notify(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600);}
-  function getSettings(){return {bookTitle:$('bookTitle').value.trim(),author:$('author').value.trim(),year:$('year').value.trim(),pageWidth:String(clamp($('pageWidth').value,4,8.5,6)),pageHeight:String(clamp($('pageHeight').value,6,11.7,9)),marginTop:String(clamp($('marginTop').value,6,40,20)),marginBottom:String(clamp($('marginBottom').value,6,40,20)),marginInside:String(clamp($('marginInside').value,6,40,22)),marginOutside:String(clamp($('marginOutside').value,6,40,16)),fontFamily:$('fontFamily').value,fontSize:String(clamp($('fontSize').value,8,16,11)),lineHeight:String(clamp($('lineHeight').value,1.1,2,1.5)),indent:String(clamp($('indent').value,0,3,1.5)),justify:$('justify').checked,chapterBreak:$('chapterBreak').checked};}
-  function applySettings(s){fields.forEach(id=>{const el=$(id);if(el.type==='checkbox')el.checked=!!s[id];else if(s[id]!==undefined)el.value=s[id];});syncPreset();}
-  function syncPreset(){document.querySelectorAll('.preset').forEach(b=>b.classList.remove('active'));const w=Number($('pageWidth').value),h=Number($('pageHeight').value);const key=Math.abs(w-6)<.01&&Math.abs(h-9)<.01?'6x9':Math.abs(w-5.5)<.01&&Math.abs(h-8.5)<.01?'5.5x8.5':Math.abs(w-5.83)<.03&&Math.abs(h-8.27)<.03?'a5':'';const match=document.querySelector(`.preset[data-size="${key}"]`);if(match)match.classList.add('active');}
-  function saveSettings(){settings=getSettings();try{localStorage.setItem('editsphere.settings.v1',JSON.stringify(settings));$('saveIndicator').textContent='Réglages enregistrés';}catch(_){$('saveIndicator').textContent='Réglages de cette session';}render();}
-  function loadSettings(){try{const stored=JSON.parse(localStorage.getItem('editsphere.settings.v1')||'null');if(stored&&typeof stored==='object')settings={...defaults,...stored};}catch(_){}applySettings(settings);}
-  function inspectMetadata(html){const doc=new DOMParser().parseFromString(html,'text/html');if(doc.querySelector('parsererror'))throw new Error('Le fichier HTML est illisible.');parsedTitle=(doc.querySelector('.book-title')?.textContent||doc.querySelector('title')?.textContent||'').trim();parsedAuthor=(doc.querySelector('.book-author')?.textContent||doc.querySelector('meta[name="author"]')?.content||'').trim();}
-  function cleanBook(html){const doc=new DOMParser().parseFromString(html,'text/html');if(doc.querySelector('parsererror'))throw new Error('Le fichier HTML est illisible.');const body=doc.body||doc.documentElement;const copy=body.cloneNode(true);const stats={comments:0,removedElements:0,links:0,spans:0,emptyBlocks:0,wordStyles:0,externalImages:0};const commentWalker=doc.createTreeWalker(doc,NodeFilter.SHOW_COMMENT);while(commentWalker.nextNode())stats.comments++;const discard='script,style,link,meta,base,iframe,object,embed,form,button,input,textarea,select,nav,svg,math,video,audio,canvas';copy.querySelectorAll('.title-page').forEach(el=>el.remove());copy.querySelectorAll(discard).forEach(el=>{stats.removedElements++;el.remove();});copy.querySelectorAll('a').forEach(a=>{stats.links++;const fragment=doc.createDocumentFragment();while(a.firstChild)fragment.appendChild(a.firstChild);a.replaceWith(fragment);});copy.querySelectorAll('span').forEach(span=>{stats.spans++;const fragment=doc.createDocumentFragment();while(span.firstChild)fragment.appendChild(span.firstChild);span.replaceWith(fragment);});copy.querySelectorAll('font,center').forEach(el=>{stats.removedElements++;const fragment=doc.createDocumentFragment();while(el.firstChild)fragment.appendChild(el.firstChild);el.replaceWith(fragment);});const bodyComments=doc.createTreeWalker(copy,NodeFilter.SHOW_COMMENT);const comments=[];while(bodyComments.nextNode())comments.push(bodyComments.currentNode);comments.forEach(comment=>comment.remove());copy.querySelectorAll('p').forEach(p=>{const style=(p.getAttribute('style')||'').toLowerCase(),align=(p.getAttribute('align')||'').toLowerCase();if(align==='right'||/text-align\s*:\s*right/.test(style))p.classList.add('align-right');if(!p.textContent.replace(/\u00a0/g,' ').trim()&&!p.querySelector('img')){const previous=p.previousElementSibling;if(previous?.classList.contains('stanza-break'))p.remove();else{p.replaceWith(Object.assign(doc.createElement('p'),{className:'stanza-break'}));}stats.emptyBlocks++;}});copy.querySelectorAll('img').forEach(img=>{const src=(img.getAttribute('src')||'').trim();if(!src.startsWith('data:image/')){stats.externalImages++;img.remove();}});const keepClasses=new Set(['align-right','stanza-break','footnote-ref','footnotes-section','footnote-text','footnote-num','novel-body']);copy.querySelectorAll('*').forEach(el=>Array.from(el.attributes).forEach(attr=>{const name=attr.name.toLowerCase();if(name==='class'){if(/\bMso\w*/i.test(attr.value))stats.wordStyles++;const safe=attr.value.split(/\s+/).filter(value=>keepClasses.has(value));if(safe.length)el.setAttribute('class',safe.join(' '));else el.removeAttribute('class');}else if(name==='src'&&el.tagName==='IMG'&&attr.value.startsWith('data:image/')){}else if(name==='alt'&&el.tagName==='IMG'){}else if((name==='width'||name==='height')&&el.tagName==='IMG'&&/^\d{1,4}$/.test(attr.value)){}else{if(name==='style'||/^mso/i.test(attr.value)||name==='id'||name.startsWith('on'))stats.wordStyles++;el.removeAttribute(attr.name);}}));copy.querySelectorAll('p.stanza-break').forEach(p=>{if(p.previousElementSibling?.classList.contains('stanza-break')){p.remove();stats.emptyBlocks++;}});copy.normalize();return {body:copy,stats};}
-  function cleanReport(stats){const total=stats.comments+stats.removedElements+stats.links+stats.spans+stats.emptyBlocks+stats.wordStyles+stats.externalImages;const parts=[];if(stats.comments)parts.push(`${stats.comments} commentaire${stats.comments>1?'s':''}`);if(stats.removedElements)parts.push(`${stats.removedElements} balise${stats.removedElements>1?'s':''} web`);if(stats.links)parts.push(`${stats.links} lien${stats.links>1?'s':''} retiré${stats.links>1?'s':''}`);if(stats.spans)parts.push(`${stats.spans} balise${stats.spans>1?'s':''} de mise en forme Word`);if(stats.wordStyles)parts.push(`${stats.wordStyles} attribut${stats.wordStyles>1?'s':''} parasite${stats.wordStyles>1?'s':''}`);if(stats.emptyBlocks)parts.push(`${stats.emptyBlocks} bloc${stats.emptyBlocks>1?'s':''} vide${stats.emptyBlocks>1?'s':''}`);if(stats.externalImages)parts.push(`${stats.externalImages} image${stats.externalImages>1?'s':''} distante${stats.externalImages>1?'s':''} retirée${stats.externalImages>1?'s':''}`);$('cleanReport').innerHTML=`<strong style="color:#315c4b">Nettoyage terminé.</strong> ${total?parts.join(' · ')+'.':'Aucun élément superflu repéré.'} Le contenu textuel des paragraphes est conservé.`;}
-  function handleFile(file){if(!file)return;if(!/\.html?$/i.test(file.name)&&file.type!=='text/html'){notify('Choisissez un fichier HTML (.html ou .htm).');return;}if(file.size>25*1024*1024){notify('Le fichier dépasse la limite de 25 Mo.');return;}const reader=new FileReader();reader.onerror=()=>notify('Impossible de lire ce fichier.');reader.onload=()=>{try{sourceHtml=String(reader.result||'');sourceName=file.name;parsedBody=null;inspectMetadata(sourceHtml);if(!$('bookTitle').value&&parsedTitle)$('bookTitle').value=parsedTitle;if(!$('author').value&&parsedAuthor)$('author').value=parsedAuthor;if(!$('year').value){const year=sourceHtml.match(/\b(?:\(?(1[5-9]\d{2}|20\d{2})\)?)/);if(year)$('year').value=year[1];}settings=getSettings();$('fileName').textContent=file.name;$('fileInfo').classList.add('visible');$('cleanButton').disabled=false;$('cleanReport').textContent='Fichier importé. Cliquez sur « Nettoyer le HTML » avant de personnaliser la mise en page.';$('exportButton').disabled=true;$('step2').classList.remove('active');$('step3').classList.remove('active');$('qualitySummary').textContent='À nettoyer';render();notify('Manuscrit importé. Lancez le nettoyage HTML pour continuer.');}catch(error){notify(error.message||'Le fichier n’a pas pu être analysé.');}};reader.readAsText(file,'UTF-8');}
-  function css(){const s=getSettings();const justify=s.justify?'justify':'left';const chapter=s.chapterBreak?'page':'auto';return `@page{size:${s.pageWidth}in ${s.pageHeight}in;margin-top:${s.marginTop}mm;margin-bottom:${s.marginBottom}mm;margin-inside:${s.marginInside}mm;margin-outside:${s.marginOutside}mm}@page:left{margin-left:${s.marginOutside}mm;margin-right:${s.marginInside}mm}@page:right{margin-left:${s.marginInside}mm;margin-right:${s.marginOutside}mm}html{font-size:${s.fontSize}pt;line-height:${s.lineHeight};-webkit-text-size-adjust:100%}body{font-family:${s.fontFamily};color:#111;background:#fff;margin:0;padding:0;text-rendering:optimizeLegibility}p{margin:0;text-indent:${s.indent}em;text-align:${justify};hyphens:auto;-webkit-hyphens:auto;orphans:2;widows:2}h1+p,h2+p,h3+p,h4+p,h5+p{ text-indent:0}p.align-right{text-align:right;text-indent:0;margin:.5em 0;font-style:italic;font-size:.9em}p.stanza-break{margin:0;height:.9em;text-indent:0}.title-page{page-break-after:always;break-after:page;text-align:center;padding-top:25%;min-height:70vh}.title-page .book-author{font-size:1.6rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:2rem;text-indent:0;text-align:center}.title-page .book-title{font-size:2.2rem;font-weight:bold;letter-spacing:.1em;line-height:1.2;margin:2rem 0}.title-page .book-year{font-size:1.1rem;color:#555;margin-top:3rem;text-indent:0;text-align:center}h1,h2,h3,h4,h5{text-align:center;font-weight:normal;break-after:avoid}h1{break-before:${chapter};font-size:1.8rem;letter-spacing:.08em;margin-top:30%;margin-bottom:2rem;text-transform:uppercase}h2{break-before:${chapter};font-size:1.4rem;letter-spacing:.06em;margin-top:20%;margin-bottom:1.5rem;text-transform:uppercase}h3{font-size:1.15rem;letter-spacing:.04em;margin:2rem 0 1rem}h4{font-size:1.05rem;letter-spacing:.02em;margin:1.5rem 0 .8rem}h5{font-size:1rem;letter-spacing:.05em;margin:1.2rem 0 .6rem;font-weight:bold}img{max-width:100%;height:auto;break-inside:avoid}sup.footnote-ref{font-size:.75em;vertical-align:super;line-height:0}.footnotes-section{break-before:page;margin-top:3rem;padding-top:1.5rem;border-top:1px solid #ccc}.footnote-text{font-size:.85rem;line-height:1.35;margin-bottom:.6rem;text-indent:0}.footnote-num{font-weight:bold;margin-right:.3em}`;}
-  function titleMarkup(){const s=getSettings();return `<div class="title-page"><p class="book-author">${esc(s.author)}</p><h1 class="book-title">${esc(s.bookTitle||'Titre du livre')}</h1>${s.year?`<p class="book-year">(${esc(s.year)})</p>`:''}</div>`;}
-  function outputHtml(){const body=parsedBody?parsedBody.innerHTML:'';const s=getSettings();return `<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>${esc(s.bookTitle||'Livre')}${s.author?' — '+esc(s.author):''}</title>\n<style>\n${css()}\n</style>\n</head>\n<body>\n${titleMarkup()}\n<div class="novel-body">\n${body}\n</div>\n</body>\n</html>`;}
-  function render(){if(!parsedBody){$('pageContent').innerHTML='<div class="empty-state"><div class="book-symbol">E</div><strong>Votre aperçu apparaîtra ici</strong><span>Importez un fichier HTML pour commencer.</span></div>';$('previewStatus').textContent='En attente d’un manuscrit';$('previewStatus').className='status';$('pageSizeLabel').textContent=`Format ${getSettings().pageWidth} × ${getSettings().pageHeight} pouces`;$('exportButton').disabled=true;return;}const s=getSettings();$('pageSizeLabel').textContent=`Format ${s.pageWidth} × ${s.pageHeight} pouces`;$('previewStatus').textContent='Aperçu prêt · texte conservé';$('previewStatus').className='status ready';if(currentView==='title'){$('pageContent').innerHTML=`<div class="sample-title"><div class="sample-author">${esc(s.author||'Nom de l’auteur')}</div><div class="sample-book-title">${esc(s.bookTitle||'Titre du livre')}</div>${s.year?`<div class="sample-year">(${esc(s.year)})</div>`:''}</div>`;$('previewLabel').textContent='Page de titre';}else{const clone=parsedBody.cloneNode(true);clone.querySelectorAll('script,style,link,meta,base').forEach(e=>e.remove());const content=document.createElement('div');content.className='sample-content';content.style.fontFamily=s.fontFamily;content.style.fontSize=`${Math.max(8,Math.min(16,Number(s.fontSize)||11))}pt`;content.style.lineHeight=s.lineHeight;content.style.setProperty('--indent',s.indent+'em');content.style.textAlign=s.justify?'justify':'left';content.style.setProperty('--indent',s.indent+'em');content.append(...Array.from(clone.childNodes).slice(0,90));content.querySelectorAll('p').forEach(p=>p.style.textIndent=p.classList.contains('align-right')?'0':s.indent+'em');const sample=content.querySelector('.title-page');if(sample)sample.remove();$('pageContent').replaceChildren(content);$('previewLabel').textContent='Début du texte';}syncPreset();}
-  function download(){if(!parsedBody){notify('Importez d’abord un fichier HTML.');return;}const blob=new Blob([outputHtml()],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;const base=(getSettings().bookTitle||sourceName.replace(/\.html?$/i,'')||'editsphere').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase()||'livre';a.download=`${base}-kdp.html`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$('step3').classList.add('active');notify('Fichier HTML exporté.');}
-  $('fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('dropzone').addEventListener('dragover',e=>{e.preventDefault();$('dropzone').classList.add('dragover');});$('dropzone').addEventListener('dragleave',()=> $('dropzone').classList.remove('dragover'));$('dropzone').addEventListener('drop',e=>{e.preventDefault();$('dropzone').classList.remove('dragover');handleFile(e.dataTransfer.files[0]);});
-  $('cleanButton').addEventListener('click',()=>{if(!sourceHtml)return;try{const result=cleanBook(sourceHtml);parsedBody=result.body;const words=(parsedBody.textContent||'').trim().split(/\s+/).filter(Boolean).length;$('qualitySummary').textContent=words.toLocaleString('fr-FR')+' mots après nettoyage';$('exportButton').disabled=false;$('step2').classList.add('active');$('step3').classList.remove('active');cleanReport(result.stats);render();notify('HTML nettoyé. Vous pouvez maintenant régler la mise en page.');}catch(error){notify(error.message||'Le nettoyage du fichier a échoué.');}});
-  fields.forEach(id=>$(id).addEventListener('input',saveSettings));$('exportButton').addEventListener('click',download);$('removeFile').addEventListener('click',()=>{sourceHtml='';sourceName='';parsedBody=null;$('fileInput').value='';$('fileInfo').classList.remove('visible');$('cleanButton').disabled=true;$('cleanReport').textContent='Importez un manuscrit pour lancer le nettoyage.';$('exportButton').disabled=true;$('step2').classList.remove('active');$('step3').classList.remove('active');$('qualitySummary').textContent='En attente du manuscrit';render();});
-  document.querySelectorAll('.preset').forEach(button=>button.addEventListener('click',()=>{const map={'6x9':['6','9'],'5.5x8.5':['5.5','8.5'],'a5':['5.83','8.27']};[$('pageWidth').value,$('pageHeight').value]=map[button.dataset.size];saveSettings();}));
-  $('titleView').addEventListener('click',()=>{currentView='title';$('titleView').classList.add('active');$('textView').classList.remove('active');render();});$('textView').addEventListener('click',()=>{currentView='text';$('textView').classList.add('active');$('titleView').classList.remove('active');render();});$('resetButton').addEventListener('click',()=>{applySettings(defaults);saveSettings();notify('Réglages réinitialisés.');});
-  loadSettings();render();
+
+  // Greek scan word transcriptions
+  const GREEK_MAP = {
+    "hugo_notre_dame_de_paris_02.jpg": "ἈΝΑΓΚΗ",
+    "hugo_notre_dame_de_paris_03.jpg": "ἈΝΑΓΚΗ",
+    "hugo_notre_dame_de_paris_04.jpg": "Μέγα βιβλίον,",
+    "hugo_notre_dame_de_paris_05.jpg": "μέγα κακόν",
+    "hugo_notre_dame_de_paris_06.jpg": "Ἀναγκοφαγία",
+    "hugo_notre_dame_de_paris_07.jpg": "ἈΝΑΓΚΗ",
+    "hugo_notre_dame_de_paris_08.png": "ἈΝΑΓΚΗ",
+    "hugo_notre_dame_de_paris_09.jpg": "Ἀναγνεία",
+    "hugo_notre_dame_de_paris_10.jpg": "Ἀναγνεία",
+    "hugo_notre_dame_de_paris_11.jpg": "Οτοτοτοτοτοτοῖ",
+    "hugo_notre_dame_de_paris_12.jpg": "δεκέμβολος"
+  };
+
+  const KDP_GUTTER_TABLE = [
+    { maxPages: 150, minGutter: 0.375 },
+    { maxPages: 300, minGutter: 0.500 },
+    { maxPages: 500, minGutter: 0.625 },
+    { maxPages: 700, minGutter: 0.750 },
+    { maxPages: 828, minGutter: 0.875 }
+  ];
+
+  let rawSourceHtml = '';
+  let sourceFileName = '';
+  let sourceFileType = '';
+  let parsedCleanDom = null;
+  let bookHeadings = [];
+  let allBookPages = []; // array of { pageNum, isOdd, type, chapterTitle, showRunningHeader, showFolio, html }
+  
+  let auditStats = {
+    rawWords: 0,
+    cleanWords: 0,
+    notesRemoved: 0,
+    tocRemoved: 0,
+    frontMatterRemoved: 0,
+    webCleaned: 0,
+    verses: 0
+  };
+
+  let previewMode = 'spread'; // 'spread' | 'single'
+  let currentSpreadIndex = 1; // 0: Cover/Page1, 1: Page 2-3, 2: Page 4-5...
+  let singlePageIndex = 0; // 0-based index into allBookPages
+  let zoomLevel = 1.0;
+  let toastTimer = null;
+
+  const clamp = (v, min, max, d) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : d; };
+  const esc = str => String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function notify(msg) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  // ISBN-13 Validator
+  function validateIsbn13(isbnStr) {
+    const clean = isbnStr.replace(/[^0-9]/g, '');
+    if (clean.length !== 13) return false;
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+      sum += parseInt(clean[i], 10) * (i % 2 === 0 ? 1 : 3);
+    }
+    const checkDigit = (10 - (sum % 10)) % 10;
+    return checkDigit === parseInt(clean[12], 10);
+  }
+
+  function updateIsbnStatus() {
+    const val = $('metaIsbn').value.trim();
+    const badge = $('isbnStatusBadge');
+    if (!val) {
+      badge.textContent = 'Non renseigné';
+      badge.style.color = 'var(--muted)';
+    } else if (validateIsbn13(val)) {
+      badge.textContent = '✓ ISBN-13 valide';
+      badge.style.color = 'var(--green)';
+    } else {
+      badge.textContent = '⚠ Clé ISBN invalide';
+      badge.style.color = 'var(--red)';
+    }
+  }
+
+  // Bundled books loading
+  async function loadBundledBooks() {
+    try {
+      const res = await fetch('/api/bundled-books');
+      if (!res.ok) return;
+      const list = await res.json();
+      const sel = $('bundledBooksSelect');
+      sel.innerHTML = '<option value="">-- Choisir une œuvre de Victor Hugo --</option>';
+      list.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.url;
+        opt.textContent = `${b.title} (${b.format}, ${(b.size / 1024).toFixed(0)} Ko)`;
+        opt.dataset.filename = b.filename;
+        opt.dataset.format = b.format;
+        sel.appendChild(opt);
+      });
+    } catch (e) {
+      console.warn('Bundled books load error', e);
+    }
+  }
+
+  async function openBundledBook(url, filename, format) {
+    notify('Chargement de ' + filename + '...');
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Impossible de charger le fichier.');
+      const text = await res.text();
+      sourceFileName = filename;
+      sourceFileType = format.toLowerCase();
+      
+      if (filename === 'napoleon-le-petit.html' || text.startsWith('From: <Saved by Blink>')) {
+        rawSourceHtml = parseMhtml(text);
+        sourceFileType = 'mhtml';
+      } else {
+        rawSourceHtml = text;
+      }
+      onSourceLoaded();
+    } catch (err) {
+      notify('Erreur : ' + err.message);
+    }
+  }
+
+  // Ingestion: MHTML Parser
+  function parseMhtml(mhtml) {
+    const boundaryMatch = mhtml.match(/boundary="?([^"\r\n;]+)"?/i);
+    if (!boundaryMatch) throw new Error('Archive MHTML sans séparateur MIME valide.');
+    const boundary = boundaryMatch[1];
+    const parts = mhtml.split(new RegExp('--' + boundary.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')));
+    let htmlPart = '';
+    const images = {};
+
+    for (const part of parts) {
+      if (!part.trim() || part.startsWith('--')) continue;
+      const idx = part.indexOf('\r\n\r\n') !== -1 ? part.indexOf('\r\n\r\n') : part.indexOf('\n\n');
+      if (idx === -1) continue;
+      const header = part.substring(0, idx);
+      const body = part.substring(idx + (part.indexOf('\r\n\r\n') !== -1 ? 4 : 2));
+      const isHtml = /Content-Type:\s*text\/html/i.test(header);
+      const isImg = /Content-Type:\s*image\//i.test(header);
+      const isQuoted = /Content-Transfer-Encoding:\s*quoted-printable/i.test(header);
+      const isBase64 = /Content-Transfer-Encoding:\s*base64/i.test(header);
+      const locMatch = header.match(/Content-Location:\s*([^\r\n]+)/i);
+      const loc = locMatch ? locMatch[1].trim() : '';
+
+      if (isHtml && !htmlPart) {
+        if (isQuoted) {
+          htmlPart = body.replace(/=(?:\r\n|\n|\r)/g, '').replace(/=([A-Fa-f0-9]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+        } else if (isBase64) {
+          try { htmlPart = atob(body.replace(/\s+/g, '')); } catch (_) { htmlPart = body; }
+        } else {
+          htmlPart = body;
+        }
+      } else if (isImg && loc && isBase64) {
+        const typeMatch = header.match(/Content-Type:\s*([^\r\n;]+)/i);
+        const mime = typeMatch ? typeMatch[1].trim() : 'image/jpeg';
+        const dataUrl = `data:${mime};base64,${body.replace(/\s+/g, '')}`;
+        images[loc] = dataUrl;
+        const fn = loc.split('/').pop();
+        if (fn) images[fn] = dataUrl;
+      }
+    }
+
+    if (!htmlPart) throw new Error('Document HTML introuvable dans l’archive MHTML.');
+    for (const [key, dUrl] of Object.entries(images)) {
+      htmlPart = htmlPart.split(key).join(dUrl);
+    }
+    return htmlPart;
+  }
+
+  // Ingestion: EPUB Parser
+  async function parseEpubFile(file) {
+    if (!window.JSZip) throw new Error('Module JSZip manquant.');
+    const zip = await JSZip.loadAsync(file);
+    const containerXml = await zip.file('META-INF/container.xml')?.async('string');
+    if (!containerXml) throw new Error('EPUB non valide : container.xml manquant.');
+    const containerDoc = new DOMParser().parseFromString(containerXml, 'application/xml');
+    const rootPath = containerDoc.querySelector('rootfile')?.getAttribute('full-path');
+    if (!rootPath) throw new Error('EPUB non valide : chemin OPF manquant.');
+
+    const opfXml = await zip.file(rootPath)?.async('string');
+    if (!opfXml) throw new Error('EPUB non valide : fichier OPF introuvable.');
+    const opfDoc = new DOMParser().parseFromString(opfXml, 'application/xml');
+    const opfDir = rootPath.includes('/') ? rootPath.substring(0, rootPath.lastIndexOf('/') + 1) : '';
+
+    const title = opfDoc.querySelector('title, dc\\:title')?.textContent?.trim() || '';
+    const creator = opfDoc.querySelector('creator, dc\\:creator')?.textContent?.trim() || '';
+    const date = opfDoc.querySelector('date, dc\\:date')?.textContent?.trim() || '';
+
+    const manifest = {};
+    opfDoc.querySelectorAll('manifest > item').forEach(item => {
+      manifest[item.getAttribute('id')] = {
+        href: item.getAttribute('href'),
+        type: item.getAttribute('media-type')
+      };
+    });
+
+    const spine = Array.from(opfDoc.querySelectorAll('spine > itemref')).map(r => r.getAttribute('idref'));
+    const chapters = [];
+
+    for (const id of spine) {
+      const item = manifest[id];
+      if (item && (item.type.includes('html') || item.type.includes('xml'))) {
+        if (/toc|sommaire/i.test(item.href)) continue;
+        const full = (opfDir + item.href).replace(/\/\.\//g, '/');
+        const f = zip.file(full) || zip.file(decodeURIComponent(full));
+        if (f) {
+          const content = await f.async('string');
+          const doc = new DOMParser().parseFromString(content, 'text/html');
+          chapters.push(`<div class="epub-section">${doc.body ? doc.body.innerHTML : content}</div>`);
+        }
+      }
+    }
+
+    return {
+      title,
+      author: creator,
+      year: date ? (date.match(/\b(1[4-9]\d\d|20\d\d)\b/) || [date])[0] : '',
+      html: chapters.join('\n\n')
+    };
+  }
+
+  // French Typography Engine
+  function applyFrenchSpacing(text) {
+    if (!text) return '';
+    text = text.replace(/[ \u00a0\u202f]*([;:!?»%€$])/g, '\u00a0$1');
+    text = text.replace(/«[ \u00a0\u202f]*/g, '«\u00a0');
+    text = text.replace(/(\w)'(\w)/g, '$1’$2');
+    text = text.replace(/(^|\n)[-–]\s+/g, '$1—\u00a0');
+    return text;
+  }
+
+  function removeNodeAndFollowing(node) {
+    let curr = node;
+    while (curr && curr.tagName !== 'BODY' && curr.tagName !== 'HTML') {
+      while (curr.nextSibling) {
+        curr.nextSibling.remove();
+      }
+      const parent = curr.parentElement;
+      curr.remove();
+      curr = parent;
+    }
+  }
+
+  // CORE CLEANING ENGINE: PURE TEXT EXTRACTION
+  function extractPureBookText(rawHtml) {
+    const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
+    if (doc.querySelector('parsererror')) throw new Error('Impossible d’analyser le contenu HTML.');
+
+    const body = doc.body || doc.documentElement;
+    const stats = {
+      rawWords: 0,
+      cleanWords: 0,
+      notesRemoved: 0,
+      tocRemoved: 0,
+      frontMatterRemoved: 0,
+      webCleaned: 0,
+      verses: 0
+    };
+
+    const rawStr = (body.textContent || '').replace(/\s+/g, ' ').trim();
+    stats.rawWords = rawStr ? rawStr.split(/\s+/).length : 0;
+
+    // 1. Remove comments, scripts, styles, forms, iframes
+    const commentWalker = doc.createTreeWalker(body, NodeFilter.SHOW_COMMENT);
+    const comments = [];
+    while (commentWalker.nextNode()) comments.push(commentWalker.currentNode);
+    comments.forEach(c => c.remove());
+
+    const discardSelectors = 'script, style, link, meta, base, iframe, object, embed, form, button, input, textarea, select, nav, svg, math, video, audio, canvas, noscript, hr';
+    body.querySelectorAll(discardSelectors).forEach(el => { stats.webCleaned++; el.remove(); });
+
+    // 2. BACK MATTER REMOVAL
+    if ($('optPurgeSourceFrontMatter').checked) {
+      const backMatterSignatures = [
+        /à\s*propos\s*de\s*cette\s*édition/i,
+        /dispositions\s*légales/i,
+        /texte\s*libre\s*de\s*droits/i,
+        /the\s*project\s*gutenberg\s*ebook/i,
+        /end\s*of\s*(?:the\s*)?project\s*gutenberg/i,
+        /texte\s*annoté\s*par\s*guy\s*rosa/i,
+        /bibliothèque\s*électronique\s*de\s*lisieux/i,
+        /cette\s*édition\s*électronique\s*a\s*été\s*réalisée/i
+      ];
+
+      const candidateElements = Array.from(body.querySelectorAll('h1, h2, h3, h4, p, div'));
+      for (let i = candidateElements.length - 1; i >= 0; i--) {
+        const el = candidateElements[i];
+        const txt = (el.textContent || '').trim();
+        if (txt && backMatterSignatures.some(re => re.test(txt))) {
+          removeNodeAndFollowing(el);
+          stats.frontMatterRemoved++;
+          break;
+        }
+      }
+    }
+
+    // 3. COMPLETE PURGE OF ALL NOTES & ANNOTATIONS
+    if ($('optPurgeAllNotes').checked) {
+      const noteSelectors = [
+        'div[id^="ftn"]', 'div[id^="fn"]', 'div[id*="note"]',
+        'p.MsoFootnoteText', 'p.footnote-text', 'div.footnotes-section',
+        '.footnote', '.footnotes', '[epub\\:type*="footnote"]', '[epub\\:type*="note"]',
+        '[style*="mso-element:footnote"]'
+      ];
+      body.querySelectorAll(noteSelectors.join(', ')).forEach(n => {
+        stats.notesRemoved++;
+        n.remove();
+      });
+
+      const noteRefSelectors = [
+        'a[href*="_ftn"]', 'a[href*="#fn"]', 'a[href*="footnote"]',
+        'a[name*="_ftn"]', 'a[name*="footnote"]', 'a[epub\\:type*="noteref"]',
+        'span.MsoFootnoteReference', 'sup.MsoFootnoteReference', 'sup.footnote-ref', 'sup'
+      ];
+      body.querySelectorAll(noteRefSelectors.join(', ')).forEach(ref => {
+        const text = ref.textContent.trim();
+        if (/^\[?\d+\]?$/.test(text) || ref.getAttribute('href')?.includes('ftn') || ref.className?.includes('Footnote')) {
+          stats.notesRemoved++;
+          ref.remove();
+        }
+      });
+    }
+
+    // 4. COMPLETE PURGE OF ORIGINAL TABLES OF CONTENTS (TOC)
+    if ($('optPurgeSourceToc').checked) {
+      body.querySelectorAll('.toc, #toc, .sommaire, #sommaire, [class*="table-matieres"], [id*="table-matieres"], [epub\\:type="toc"]').forEach(el => {
+        stats.tocRemoved++;
+        el.remove();
+      });
+      body.querySelectorAll('p[class*="MsoToc"], p[class*="toc"]').forEach(el => {
+        stats.tocRemoved++;
+        el.remove();
+      });
+
+      body.querySelectorAll('h1, h2, h3, h4, h5, p, div').forEach(el => {
+        const txt = (el.textContent || '').trim().toLowerCase();
+        if (/^(?:table des matières|sommaire|table of contents|contents)\b/i.test(txt)) {
+          stats.tocRemoved++;
+          let next = el.nextElementSibling;
+          while (next && (next.querySelector('a[href^="#"]') || next.classList?.contains('MsoToc1') || next.classList?.contains('MsoToc2') || !next.textContent.trim())) {
+            const toDel = next;
+            next = next.nextElementSibling;
+            toDel.remove();
+            stats.tocRemoved++;
+          }
+          el.remove();
+        }
+      });
+    }
+
+    // 5. SOURCE FRONT MATTER PURGE
+    if ($('optPurgeSourceFrontMatter').checked) {
+      const candidateHeaders = Array.from(body.querySelectorAll('h1, h2, h3, p'));
+      let firstRealChapterIndex = -1;
+      
+      const frontClasses = new Set(['auteur', 'titrelivre', 'datesortie', 'photoauteur', 'book-author', 'book-title', 'book-year']);
+      const frontPhrases = /(?:publication du groupe|ebooks libres et gratuits|texte établi d’après|première publication|annoté par|^\(?\d{4}\)?$)/i;
+
+      for (let i = 0; i < candidateHeaders.length; i++) {
+        const el = candidateHeaders[i];
+        const txt = (el.textContent || '').trim();
+        const classes = Array.from(el.classList).map(c => c.toLowerCase());
+        const hasFrontClass = classes.some(c => frontClasses.has(c));
+
+        if (!txt) continue;
+        if (hasFrontClass || frontPhrases.test(txt)) {
+          continue;
+        }
+
+        const isHeadingTag = /H[1-3]/.test(el.tagName);
+        const looksLikeChapterTitle = /^(?:livre|chapitre|partie|prologue|préface|acte|scène|tome)\b/i.test(txt);
+        const isLongStoryParagraph = txt.length > 90 && /[.!?]/.test(txt);
+
+        if (isHeadingTag || looksLikeChapterTitle || isLongStoryParagraph) {
+          firstRealChapterIndex = i;
+          break;
+        }
+      }
+
+      if (firstRealChapterIndex > 0) {
+        for (let i = 0; i < firstRealChapterIndex; i++) {
+          const el = candidateHeaders[i];
+          if (el && el.parentElement) {
+            stats.frontMatterRemoved++;
+            el.remove();
+          }
+        }
+      }
+    }
+
+    // 6. GREEK AND IMAGE REPLACEMENTS
+    body.querySelectorAll('img').forEach(img => {
+      const src = img.getAttribute('src') || '';
+      const fn = src.split('/').pop().split('?')[0];
+      if (GREEK_MAP[fn]) {
+        const span = doc.createElement('span');
+        span.className = 'greek-word';
+        span.textContent = GREEK_MAP[fn];
+        img.replaceWith(span);
+        stats.webCleaned++;
+      } else if (!src.startsWith('data:image/')) {
+        img.remove();
+        stats.webCleaned++;
+      }
+    });
+
+    // 7. UNWRAP WRAPPER DIVS (Word Section1, epub-section, etc.) SO CONTENT IS CLEAN & FLAT
+    body.querySelectorAll('div').forEach(div => {
+      const parent = div.parentNode;
+      if (parent) {
+        while (div.firstChild) {
+          parent.insertBefore(div.firstChild, div);
+        }
+        div.remove();
+      }
+    });
+
+    // 8. UNWRAP ANCHORS AND SPANS
+    body.querySelectorAll('a').forEach(a => {
+      const frag = doc.createDocumentFragment();
+      while (a.firstChild) frag.appendChild(a.firstChild);
+      a.replaceWith(frag);
+    });
+
+    body.querySelectorAll('span').forEach(span => {
+      if (span.classList.contains('greek-word')) return;
+      const frag = doc.createDocumentFragment();
+      while (span.firstChild) frag.appendChild(span.firstChild);
+      span.replaceWith(frag);
+    });
+
+    body.querySelectorAll('font, center').forEach(el => {
+      const frag = doc.createDocumentFragment();
+      while (el.firstChild) frag.appendChild(el.firstChild);
+      el.replaceWith(frag);
+    });
+
+    // 9. PARAGRAPH LEVEL PURGE & FRENCH TYPOGRAPHY
+    const isVerseActive = $('optDetectVerse').checked;
+    const isFrenchSpacing = $('optFrenchSpacing').checked;
+
+    body.querySelectorAll('p, blockquote').forEach(p => {
+      let inner = p.innerHTML;
+      inner = inner.replace(/\[\d+\]/g, '');
+      inner = inner.replace(/\s*\(\d+\)\s*/g, ' ');
+      p.innerHTML = inner.replace(/\s{2,}/g, ' ');
+
+      const text = p.textContent.replace(/\u00a0/g, ' ').trim();
+      const style = (p.getAttribute('style') || '').toLowerCase();
+      const align = (p.getAttribute('align') || '').toLowerCase();
+
+      if (align === 'right' || /text-align\s*:\s*right/.test(style)) {
+        p.classList.add('align-right');
+      }
+
+      if (!text && !p.querySelector('img')) {
+        const prev = p.previousElementSibling;
+        if (prev?.classList.contains('stanza-break')) {
+          p.remove();
+        } else {
+          p.replaceWith(Object.assign(doc.createElement('p'), { className: 'stanza-break' }));
+        }
+        return;
+      }
+
+      if (isVerseActive && text.length >= 2 && text.length <= 75 && !text.startsWith('—') && !text.startsWith('-')) {
+        const firstLetterIdx = text.search(/[a-zA-ZÀ-ÿ]/);
+        if (firstLetterIdx !== -1 && text[firstLetterIdx] === text[firstLetterIdx].toUpperCase() && !/[.!?]$/.test(text)) {
+          p.classList.add('v');
+          stats.verses++;
+        }
+      }
+
+      if (isFrenchSpacing && p.textContent) {
+        p.textContent = applyFrenchSpacing(p.textContent);
+      }
+    });
+
+    // 10. CLEAN ATTRIBUTES
+    const keepClasses = new Set(['align-right', 'stanza-break', 'v', 'greek-word', 'chapter-title']);
+    body.querySelectorAll('*').forEach(el => {
+      Array.from(el.attributes).forEach(attr => {
+        const name = attr.name.toLowerCase();
+        if (name === 'class') {
+          const safe = attr.value.split(/\s+/).filter(c => keepClasses.has(c));
+          if (safe.length) el.setAttribute('class', safe.join(' '));
+          else el.removeAttribute('class');
+        } else if (name === 'src' && el.tagName === 'IMG' && attr.value.startsWith('data:image/')) {
+        } else {
+          el.removeAttribute(attr.name);
+        }
+      });
+    });
+
+    // Clean duplicate stanza breaks
+    body.querySelectorAll('p.stanza-break').forEach(p => {
+      if (p.previousElementSibling?.classList.contains('stanza-break')) {
+        p.remove();
+      }
+    });
+
+    body.normalize();
+
+    // 11. EXTRACT HEADINGS FOR THE USER'S OWN NEW CLEAN TOC
+    const headings = [];
+    body.querySelectorAll('h1, h2, h3').forEach((h, idx) => {
+      const text = h.textContent.trim();
+      if (text) {
+        const id = 'chap-' + (idx + 1);
+        h.setAttribute('id', id);
+        h.classList.add('chapter-title');
+        headings.push({ level: parseInt(h.tagName.substring(1), 10), id, text });
+      }
+    });
+
+    const cleanStr = body.textContent.replace(/\s+/g, ' ').trim();
+    stats.cleanWords = cleanStr ? cleanStr.split(/\s+/).length : 0;
+
+    return {
+      body,
+      headings,
+      stats
+    };
+  }
+
+  // Source Metadata Extraction before stripping
+  function extractSourceMetadata(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    let title = (doc.querySelector('.book-title, .Titrelivre, title')?.textContent || '').trim();
+    let author = (doc.querySelector('.book-author, .Auteur, meta[name="author"]')?.textContent || doc.querySelector('meta[name="author"]')?.content || '').trim();
+    let year = '';
+
+    title = title.split(' - ')[0].replace(/^Ebooks gratuits\s*:\s*/i, '').trim();
+    const yearMatch = html.match(/\b(?:\(?([1-2]\d{3})\)?)/);
+    if (yearMatch) year = yearMatch[1];
+
+    if (title && !$('metaBookTitle').value) $('metaBookTitle').value = title;
+    if (author && !$('metaAuthor').value) $('metaAuthor').value = author;
+    if (year && !$('metaOriginalYear').value) $('metaOriginalYear').value = year;
+  }
+
+  // Layout & KDP Specs Calculation
+  function getLayoutSpecs() {
+    const widthIn = clamp($('pageWidth').value, 4, 8.5, 6);
+    const heightIn = clamp($('pageHeight').value, 6, 11.7, 9);
+    const marginInsideMm = clamp($('marginInside').value, 8, 45, 18);
+    const marginOutsideMm = clamp($('marginOutside').value, 8, 35, 16);
+    const marginTopMm = clamp($('marginTop').value, 10, 35, 18);
+    const marginBottomMm = clamp($('marginBottom').value, 10, 35, 18);
+    const paper = $('paperColor').value;
+
+    const totalPages = allBookPages.length > 0 ? allBookPages.length : Math.max(24, Math.ceil((auditStats.cleanWords || 1000) / 220) + 6);
+
+    let minGutterIn = 0.375;
+    for (const row of KDP_GUTTER_TABLE) {
+      if (totalPages <= row.maxPages) {
+        minGutterIn = row.minGutter;
+        break;
+      }
+    }
+    const minGutterMm = Math.round(minGutterIn * 25.4 * 10) / 10;
+    const gutterComfortMm = Math.max(0, Math.round((marginInsideMm - minGutterMm) * 10) / 10);
+
+    const pageThickness = paper === 'cream' ? 0.0635 : 0.0572;
+    const spineWidthMm = Math.round(totalPages * pageThickness * 10) / 10;
+
+    return {
+      widthIn,
+      heightIn,
+      marginInsideMm,
+      marginOutsideMm,
+      marginTopMm,
+      marginBottomMm,
+      paper,
+      totalPages,
+      minGutterMm,
+      gutterComfortMm,
+      spineWidthMm
+    };
+  }
+
+  function updateKdpBadges() {
+    const specs = getLayoutSpecs();
+    $('topTrimBadge').textContent = `${specs.widthIn} × ${specs.heightIn} po`;
+    $('topPagesBadge').textContent = `${specs.totalPages} p.`;
+    $('topSpineBadge').textContent = `${specs.spineWidthMm.toFixed(1)} mm`;
+
+    $('previewFormatLabel').textContent = `${specs.widthIn} × ${specs.heightIn} po (${specs.paper === 'cream' ? 'Papier crème' : 'Papier blanc'})`;
+    $('gutterKdpMin').textContent = `Min KDP : ${specs.minGutterMm} mm`;
+    $('calcPagesCount').textContent = `${specs.totalPages} pages`;
+    $('calcSpineWidth').textContent = `${specs.spineWidthMm.toFixed(1)} mm`;
+    $('calcMinGutter').textContent = `${specs.minGutterMm} mm`;
+    $('calcGutterComfort').textContent = `+${specs.gutterComfortMm.toFixed(1)} mm`;
+
+    const sheets = document.querySelectorAll('.page-sheet');
+    sheets.forEach(s => s.classList.toggle('cream', specs.paper === 'cream'));
+  }
+
+  function syncPresetButtons() {
+    document.querySelectorAll('.preset').forEach(b => b.classList.remove('active'));
+    const w = Number($('pageWidth').value), h = Number($('pageHeight').value);
+    const key = Math.abs(w - 6) < .02 && Math.abs(h - 9) < .02 ? '6x9' :
+      Math.abs(w - 5.5) < .02 && Math.abs(h - 8.5) < .02 ? '5.5x8.5' :
+      Math.abs(w - 5) < .02 && Math.abs(h - 8) < .02 ? '5x8' :
+      Math.abs(w - 6.14) < .02 && Math.abs(h - 9.21) < .02 ? '6.14x9.21' :
+      Math.abs(w - 5.83) < .03 && Math.abs(h - 8.27) < .03 ? 'a5' : '';
+    const match = document.querySelector(`.preset[data-size="${key}"]`);
+    if (match) match.classList.add('active');
+  }
+
+  // REALISTIC BOOK PAGINATOR
+  // Slices all elements into actual book pages with accurate capacity
+  function buildBookPages() {
+    if (!parsedCleanDom) return [];
+    const pages = [];
+    const title = $('metaBookTitle').value.trim() || 'TITRE DU LIVRE';
+    const subtitle = $('metaBookSubtitle').value.trim();
+    const author = $('metaAuthor').value.trim() || 'AUTEUR';
+    const publisher = $('metaPublisher').value.trim() || 'ÉDITIONS EDITSPHERE';
+    const collection = $('metaCollection').value.trim();
+    const editor = $('metaEditor').value.trim();
+    const origYear = $('metaOriginalYear').value.trim();
+    const pubYear = $('metaPubYear').value.trim() || '2026';
+    const isbn = $('metaIsbn').value.trim();
+    const depotLegal = $('metaDepotLegal').value.trim();
+    const city = $('metaCity').value.trim();
+    const publicDomainText = $('metaPublicDomainText').value.trim();
+    const chapterBreak = $('chapterBreak').checked;
+
+    // Page 1: Faux-titre (recto / odd)
+    pages.push({
+      pageNum: 1,
+      isOdd: true,
+      type: 'half-title',
+      showRunningHeader: false,
+      showFolio: false,
+      html: `
+        <div class="tpl-title-page" style="justify-content:center">
+          <div class="tpl-book-title" style="font-size:18px;font-weight:normal;letter-spacing:.06em">${esc(title)}</div>
+        </div>`
+    });
+
+    // Page 2: Blank page (verso / even)
+    pages.push({
+      pageNum: 2,
+      isOdd: false,
+      type: 'blank',
+      showRunningHeader: false,
+      showFolio: false,
+      html: ''
+    });
+
+    // Page 3: Grand Titre (recto / odd)
+    pages.push({
+      pageNum: 3,
+      isOdd: true,
+      type: 'main-title',
+      showRunningHeader: false,
+      showFolio: false,
+      html: `
+        <div class="tpl-title-page">
+          <div class="tpl-publisher-mark">${esc(collection || publisher)}</div>
+          <div style="margin:auto 0">
+            <div class="tpl-author">${esc(author)}</div>
+            <div class="tpl-book-title">${esc(title)}</div>
+            ${subtitle ? `<div class="tpl-book-subtitle">${esc(subtitle)}</div>` : ''}
+            ${editor ? `<div class="tpl-editor">${esc(editor)}</div>` : ''}
+          </div>
+          <div>
+            <div class="tpl-publisher-mark" style="font-weight:700;color:var(--ink)">${esc(publisher)}</div>
+            ${city ? `<div style="font-size:10px;color:#777;margin-top:2px">${esc(city)}</div>` : ''}
+            <div class="tpl-year" style="margin-top:4px">${esc(pubYear)}</div>
+          </div>
+        </div>`
+    });
+
+    // Page 4: Mentions légales / Verso de titre (verso / even)
+    pages.push({
+      pageNum: 4,
+      isOdd: false,
+      type: 'legal',
+      showRunningHeader: false,
+      showFolio: false,
+      html: `
+        <div class="tpl-legal-page">
+          <p><strong>${esc(publisher)}</strong>${collection ? `<br>${esc(collection)}` : ''}</p>
+          ${origYear ? `<p>Première édition originale : ${esc(origYear)}</p>` : ''}
+          <p>Présente édition : © ${esc(pubYear)} ${esc(publisher)}<br>Tous droits réservés pour tous pays.</p>
+          ${isbn ? `<p><strong>ISBN-13 :</strong> ${esc(isbn)}</p>` : ''}
+          ${depotLegal ? `<p>Dépôt légal : ${esc(depotLegal)}</p>` : ''}
+          <p>Imprimé par Amazon pour le compte de ${esc(publisher)}.</p>
+          <div style="margin-top:14px;padding-top:10px;border-top:.5px solid #ccc;font-size:8.5px;color:#777">
+            ${esc(publicDomainText)}
+          </div>
+        </div>`
+    });
+
+    // Page 5: Sommaire (if enabled)
+    if ($('enableToc').checked && bookHeadings.length) {
+      const tocItemsHtml = bookHeadings.slice(0, 16).map((h, i) => `
+        <div class="toc-item">
+          <span>${esc(h.text)}</span>
+          <span>${7 + i * 14}</span>
+        </div>
+      `).join('');
+
+      pages.push({
+        pageNum: 5,
+        isOdd: true,
+        type: 'toc',
+        showRunningHeader: false,
+        showFolio: true,
+        html: `
+          <div class="tpl-toc">
+            <h3>SOMMAIRE</h3>
+            ${tocItemsHtml}
+          </div>`
+      });
+
+      pages.push({
+        pageNum: 6,
+        isOdd: false,
+        type: 'blank',
+        showRunningHeader: false,
+        showFolio: false,
+        html: ''
+      });
+    }
+
+    // Paginate text content blocks
+    const contentBlocks = Array.from(parsedCleanDom.querySelectorAll('h1, h2, h3, h4, p, blockquote'))
+      .filter(el => el.textContent.trim().length > 0 || el.classList.contains('stanza-break'));
+
+    let currentChapterTitle = bookHeadings[0]?.text || 'CHAPITRE I';
+    let currentPageHtml = [];
+    let currentCharsOnPage = 0;
+    let pageCapacity = 1150; // standard page characters
+    let pageCountTracker = pages.length;
+
+    for (let i = 0; i < contentBlocks.length; i++) {
+      const el = contentBlocks[i];
+      const isH1 = el.tagName === 'H1';
+      const isH2 = el.tagName === 'H2';
+      const textLen = el.textContent.trim().length;
+
+      if (isH1 || isH2) {
+        currentChapterTitle = el.textContent.trim();
+      }
+
+      // Check if page needs to be broken
+      const shouldBreakForChapter = (isH1 && chapterBreak) || (isH2 && chapterBreak && currentPageHtml.length > 0);
+      const shouldBreakForLength = (currentCharsOnPage + textLen > pageCapacity && currentPageHtml.length > 0);
+
+      if (shouldBreakForChapter || shouldBreakForLength) {
+        if (currentPageHtml.length > 0) {
+          pageCountTracker++;
+          const isOddPage = pageCountTracker % 2 !== 0;
+          pages.push({
+            pageNum: pageCountTracker,
+            isOdd: isOddPage,
+            type: 'text',
+            chapterTitle: currentChapterTitle,
+            showRunningHeader: true,
+            showFolio: true,
+            html: currentPageHtml.join('')
+          });
+          currentPageHtml = [];
+          currentCharsOnPage = 0;
+          pageCapacity = 1150;
+        }
+      }
+
+      // If starting chapter with H1, reduce capacity for title spacing
+      if (isH1 && currentPageHtml.length === 0) {
+        pageCapacity = 750;
+      }
+
+      currentPageHtml.push(el.outerHTML);
+      currentCharsOnPage += textLen + 40;
+    }
+
+    if (currentPageHtml.length > 0) {
+      pageCountTracker++;
+      pages.push({
+        pageNum: pageCountTracker,
+        isOdd: pageCountTracker % 2 !== 0,
+        type: 'text',
+        chapterTitle: currentChapterTitle,
+        showRunningHeader: true,
+        showFolio: true,
+        html: currentPageHtml.join('')
+      });
+    }
+
+    return pages;
+  }
+
+  // RENDER THE INTERACTIVE PREVIEW
+  function renderPreview() {
+    if (!parsedCleanDom) {
+      $('pageLeftContent').innerHTML = '<div class="empty-state"><div class="empty-book-icon">E</div><strong>Votre texte intégral pur apparaîtra ici</strong><span>Importez un livre d’origine pour lancer l’épuration automatique.</span></div>';
+      $('pageRightContent').innerHTML = '<div class="empty-state"><div class="empty-book-icon">E</div><strong>Aperçu en temps réel</strong><span>Visualisez le texte épuré avec vos propres métadonnées d’édition.</span></div>';
+      $('pageLeftHeader').classList.add('hidden');
+      $('pageRightHeader').classList.add('hidden');
+      $('exportHtmlBtn').disabled = true;
+      $('cleanActionBtn').disabled = true;
+      updateKdpBadges();
+      return;
+    }
+
+    $('exportHtmlBtn').disabled = false;
+    $('cleanActionBtn').disabled = false;
+
+    // 1. Rebuild pages
+    allBookPages = buildBookPages();
+    updateKdpBadges();
+
+    const title = $('metaBookTitle').value.trim() || 'TITRE DU LIVRE';
+    const specs = getLayoutSpecs();
+
+    // 2. Apply Dynamic Physical Margins to Page Sheets
+    // Calculate pixel scale based on trim width
+    const baseWidthPx = 375;
+    const pxPerMm = baseWidthPx / (specs.widthIn * 25.4);
+
+    const topPad = Math.round(specs.marginTopMm * pxPerMm);
+    const botPad = Math.round(specs.marginBottomMm * pxPerMm);
+    const insidePad = Math.round(specs.marginInsideMm * pxPerMm); // Petit fond / Reliure
+    const outsidePad = Math.round(specs.marginOutsideMm * pxPerMm); // Grand fond / Tranche
+
+    // Left Page (Even/Verso): outside on left, inside (reliure) on right!
+    $('pageLeft').style.padding = `${topPad}px ${insidePad}px ${botPad}px ${outsidePad}px`;
+    $('pageLeft').style.aspectRatio = `${specs.widthIn} / ${specs.heightIn}`;
+
+    // Right Page (Odd/Recto): inside (reliure) on left, outside on right!
+    $('pageRight').style.padding = `${topPad}px ${outsidePad}px ${botPad}px ${insidePad}px`;
+    $('pageRight').style.aspectRatio = `${specs.widthIn} / ${specs.heightIn}`;
+
+    // Typography styles on body
+    const typoStyles = `
+      font-size: ${$('fontSize').value}pt;
+      line-height: ${$('lineHeight').value};
+      font-family: ${$('fontFamily').value};
+      text-align: ${$('justify').checked ? 'justify' : 'left'};
+    `;
+    $('pageLeftContent').style.cssText = typoStyles;
+    $('pageRightContent').style.cssText = typoStyles;
+
+    // 3. Render content depending on mode (Spread vs Single)
+    const totalSpreads = Math.ceil(allBookPages.length / 2);
+
+    if (previewMode === 'single') {
+      // Single Page Mode
+      singlePageIndex = clamp(singlePageIndex, 0, allBookPages.length - 1, 0);
+      const page = allBookPages[singlePageIndex];
+
+      $('pageRightHeader').classList.toggle('hidden', !page.showRunningHeader);
+      $('pageRightTitle').textContent = (page.chapterTitle || title).toUpperCase();
+      $('pageRightContent').innerHTML = page.html;
+      $('pageRightNum').textContent = page.showFolio ? String(page.pageNum) : '';
+
+      $('pageCounterDisplay').textContent = `Page ${page.pageNum} sur ${allBookPages.length}`;
+      $('prevPageBtn').disabled = (singlePageIndex <= 0);
+      $('nextPageBtn').disabled = (singlePageIndex >= allBookPages.length - 1);
+      return;
+    }
+
+    // Spread Mode (Two pages side-by-side)
+    currentSpreadIndex = clamp(currentSpreadIndex, 0, totalSpreads, 1);
+
+    let leftPageData = null;
+    let rightPageData = null;
+
+    if (currentSpreadIndex === 0) {
+      // Cover spread: Left is blank/inside, Right is Page 1 (Faux-titre)
+      rightPageData = allBookPages[0];
+    } else {
+      const leftIdx = (currentSpreadIndex * 2) - 2; // Even page
+      const rightIdx = (currentSpreadIndex * 2) - 1; // Odd page
+      leftPageData = allBookPages[leftIdx] || null;
+      rightPageData = allBookPages[rightIdx] || null;
+    }
+
+    // Left Page
+    if (leftPageData) {
+      $('pageLeft').style.visibility = 'visible';
+      $('pageLeftHeader').classList.toggle('hidden', !leftPageData.showRunningHeader);
+      $('pageLeftTitle').textContent = esc(title.toUpperCase());
+      $('pageLeftContent').innerHTML = leftPageData.html;
+      $('pageLeftNum').textContent = leftPageData.showFolio ? String(leftPageData.pageNum) : '';
+    } else {
+      $('pageLeft').style.visibility = 'hidden';
+      $('pageLeftContent').innerHTML = '';
+      $('pageLeftNum').textContent = '';
+    }
+
+    // Right Page
+    if (rightPageData) {
+      $('pageRight').style.visibility = 'visible';
+      $('pageRightHeader').classList.toggle('hidden', !rightPageData.showRunningHeader);
+      $('pageRightTitle').textContent = (rightPageData.chapterTitle || 'CHAPITRE I').toUpperCase();
+      $('pageRightContent').innerHTML = rightPageData.html;
+      $('pageRightNum').textContent = rightPageData.showFolio ? String(rightPageData.pageNum) : '';
+    } else {
+      $('pageRight').style.visibility = 'hidden';
+      $('pageRightContent').innerHTML = '';
+      $('pageRightNum').textContent = '';
+    }
+
+    // Counter display
+    const pLeftNum = leftPageData ? leftPageData.pageNum : '-';
+    const pRightNum = rightPageData ? rightPageData.pageNum : '-';
+    $('pageCounterDisplay').textContent = `Pages ${pLeftNum} - ${pRightNum} sur ${allBookPages.length}`;
+
+    $('prevPageBtn').disabled = (currentSpreadIndex <= 0);
+    $('nextPageBtn').disabled = (currentSpreadIndex >= totalSpreads - 1);
+  }
+
+  // Trigger file handling
+  async function handleSelectedFile(file) {
+    if (!file) return;
+    notify('Chargement de ' + file.name + '...');
+    sourceFileName = file.name;
+    const ext = file.name.split('.').pop().toLowerCase();
+    sourceFileType = ext;
+
+    try {
+      if (ext === 'epub') {
+        const epubData = await parseEpubFile(file);
+        rawSourceHtml = epubData.html;
+        if (epubData.title) $('metaBookTitle').value = epubData.title;
+        if (epubData.author) $('metaAuthor').value = epubData.author;
+        if (epubData.year) $('metaOriginalYear').value = epubData.year;
+      } else {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const content = String(e.target.result || '');
+          if (ext === 'mht' || ext === 'mhtml' || content.startsWith('From: <Saved by Blink>')) {
+            rawSourceHtml = parseMhtml(content);
+            sourceFileType = 'mhtml';
+          } else {
+            rawSourceHtml = content;
+          }
+          onSourceLoaded();
+        };
+        reader.readAsText(file, 'UTF-8');
+        return;
+      }
+      onSourceLoaded();
+    } catch (err) {
+      notify('Erreur de lecture : ' + err.message);
+    }
+  }
+
+  function onSourceLoaded() {
+    $('fileName').textContent = sourceFileName;
+    $('fileFormatTag').textContent = sourceFileType.toUpperCase();
+    $('fileInfo').classList.add('visible');
+    extractSourceMetadata(rawSourceHtml);
+    executeCleaning();
+    notify('Extraction du texte intégral pur terminée !');
+  }
+
+  function executeCleaning() {
+    if (!rawSourceHtml) return;
+    try {
+      const result = extractPureBookText(rawSourceHtml);
+      parsedCleanDom = result.body;
+      bookHeadings = result.headings;
+      auditStats = result.stats;
+
+      // Update audit box
+      $('auditStatus').innerHTML = '<strong style="color:var(--green)">✓ Extraction terminée : 100% Texte Intégral Pur</strong> (Notes, anciennes tables des matières et scories d’origine éliminées).';
+      $('auditGrid').classList.remove('hidden');
+      $('auditActionRow').classList.remove('hidden');
+
+      $('metricWords').textContent = auditStats.cleanWords.toLocaleString('fr-FR');
+      $('metricNotesRemoved').textContent = String(auditStats.notesRemoved);
+      $('metricTocRemoved').textContent = String(auditStats.tocRemoved);
+      $('metricFrontMatterRemoved').textContent = String(auditStats.frontMatterRemoved);
+      $('metricWebCleaned').textContent = String(auditStats.webCleaned);
+      $('metricVerses').textContent = String(auditStats.verses);
+
+      currentSpreadIndex = 1; // start on spread 1 (Grand Titre)
+      renderPreview();
+      updateIsbnStatus();
+    } catch (err) {
+      notify('Erreur d’extraction : ' + err.message);
+    }
+  }
+
+  // Generate CSS for export and printing
+  function generateKdpCss() {
+    const s = getLayoutSpecs();
+    const font = $('fontFamily').value;
+    const fontSize = $('fontSize').value;
+    const lineHeight = $('lineHeight').value;
+    const indent = $('indent').value;
+    const justify = $('justify').checked ? 'justify' : 'left';
+    const breakVal = $('chapterBreak').checked ? 'page' : 'auto';
+
+    return `
+      @page {
+        size: ${s.widthIn}in ${s.heightIn}in;
+        margin-top: ${s.marginTopMm}mm;
+        margin-bottom: ${s.marginBottomMm}mm;
+      }
+      @page :left {
+        margin-left: ${s.marginOutsideMm}mm;
+        margin-right: ${s.marginInsideMm}mm;
+        @top-left {
+          content: "${esc($('metaBookTitle').value.trim().toUpperCase())}";
+          font-family: ${font};
+          font-size: 8.5pt;
+          letter-spacing: .08em;
+        }
+        @bottom-left {
+          content: counter(page);
+          font-family: ${font};
+          font-size: 9pt;
+        }
+      }
+      @page :right {
+        margin-left: ${s.marginInsideMm}mm;
+        margin-right: ${s.marginOutsideMm}mm;
+        @top-right {
+          content: string(chapter-title);
+          font-family: ${font};
+          font-size: 8.5pt;
+          letter-spacing: .08em;
+        }
+        @bottom-right {
+          content: counter(page);
+          font-family: ${font};
+          font-size: 9pt;
+        }
+      }
+      @page :first {
+        @top-left { content: normal; }
+        @top-right { content: normal; }
+        @bottom-left { content: normal; }
+        @bottom-right { content: normal; }
+      }
+      html {
+        font-size: ${fontSize}pt;
+        line-height: ${lineHeight};
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family: ${font};
+        color: #111;
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        text-rendering: optimizeLegibility;
+      }
+      p {
+        margin: 0;
+        text-indent: ${indent}em;
+        text-align: ${justify};
+        hyphens: auto;
+        -webkit-hyphens: auto;
+        orphans: 2;
+        widows: 2;
+      }
+      h1 + p, h2 + p, h3 + p, h4 + p { text-indent: 0; }
+      p.align-right { text-align: right; text-indent: 0; margin: .5em 0; font-style: italic; }
+      p.v { text-align: left; text-indent: 0; padding-left: 2em; }
+      p.stanza-break { margin: 0; height: .8em; text-indent: 0; }
+      
+      .title-page {
+        break-before: page;
+        break-after: page;
+        text-align: center;
+        padding-top: 25%;
+        min-height: 80vh;
+      }
+      .title-page .author { font-size: 1.4rem; letter-spacing: .15em; text-transform: uppercase; margin-bottom: 2rem; }
+      .title-page .title { font-size: 2.2rem; font-weight: bold; letter-spacing: .05em; line-height: 1.2; margin: 1.5rem 0 .5rem; }
+      .title-page .subtitle { font-size: 1.1rem; font-style: italic; margin-bottom: 2rem; }
+      .title-page .publisher { margin-top: 4rem; font-size: 1rem; letter-spacing: .1em; text-transform: uppercase; }
+      
+      .legal-page {
+        break-before: page;
+        break-after: page;
+        font-size: .8rem;
+        line-height: 1.5;
+        padding-top: 55%;
+        color: #444;
+      }
+      
+      .toc-page {
+        break-before: page;
+        break-after: page;
+        margin-bottom: 2rem;
+      }
+      .toc-page h2 { text-align: center; font-weight: normal; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2rem; }
+      
+      h1, h2, h3 {
+        text-align: center;
+        font-weight: normal;
+        break-after: avoid;
+        text-transform: uppercase;
+      }
+      h1 {
+        break-before: ${breakVal};
+        string-set: chapter-title content();
+        font-size: 1.6rem;
+        letter-spacing: .08em;
+        margin-top: 25%;
+        margin-bottom: 2rem;
+      }
+      h2 {
+        break-before: ${breakVal};
+        font-size: 1.3rem;
+        letter-spacing: .06em;
+        margin-top: 20%;
+        margin-bottom: 1.5rem;
+      }
+    `;
+  }
+
+  // Export Full KDP HTML file
+  function exportKdpFile() {
+    if (!parsedCleanDom) {
+      notify('Importez d’abord un livre pour exporter.');
+      return;
+    }
+    const title = $('metaBookTitle').value.trim() || 'Livre';
+    const subtitle = $('metaBookSubtitle').value.trim();
+    const author = $('metaAuthor').value.trim();
+    const publisher = $('metaPublisher').value.trim();
+    const pubYear = $('metaPubYear').value.trim() || '2026';
+    const origYear = $('metaOriginalYear').value.trim();
+    const isbn = $('metaIsbn').value.trim();
+    const depotLegal = $('metaDepotLegal').value.trim();
+    const city = $('metaCity').value.trim();
+    const publicDomainText = $('metaPublicDomainText').value.trim();
+
+    let tocMarkup = '';
+    if ($('enableToc').checked && bookHeadings.length) {
+      tocMarkup = `
+        <div class="toc-page">
+          <h2>SOMMAIRE</h2>
+          <div class="toc-items">
+            ${bookHeadings.map(h => `<p style="margin:6px 0;text-indent:0"><a href="#${h.id}" style="color:inherit;text-decoration:none">${esc(h.text)}</a></p>`).join('')}
+          </div>
+        </div>`;
+    }
+
+    const html = `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}${author ? ' — ' + esc(author) : ''}</title>
+<style>
+${generateKdpCss()}
+</style>
+</head>
+<body>
+  <!-- Faux-titre -->
+  <div class="title-page" style="padding-top:35%">
+    <div class="title" style="font-size:1.6rem;font-weight:normal">${esc(title)}</div>
+  </div>
+
+  <!-- Grand Titre de votre maison d'édition -->
+  <div class="title-page">
+    <div class="author">${esc(author)}</div>
+    <div class="title">${esc(title)}</div>
+    ${subtitle ? `<div class="subtitle">${esc(subtitle)}</div>` : ''}
+    <div class="publisher">${esc(publisher)}<br><small>${esc(city)} · ${esc(pubYear)}</small></div>
+  </div>
+
+  <!-- Mentions Légales & Verso réédité -->
+  <div class="legal-page">
+    <p><strong>${esc(publisher)}</strong></p>
+    ${origYear ? `<p>Première édition originale : ${esc(origYear)}</p>` : ''}
+    <p>Présente édition : © ${esc(pubYear)} ${esc(publisher)}<br>Tous droits réservés.</p>
+    ${isbn ? `<p>ISBN-13 : ${esc(isbn)}</p>` : ''}
+    ${depotLegal ? `<p>Dépôt légal : ${esc(depotLegal)}</p>` : ''}
+    <p>Imprimé par Amazon pour le compte de ${esc(publisher)}.</p>
+    <p style="margin-top:1.5rem;font-size:.75rem">${esc(publicDomainText)}</p>
+  </div>
+
+  <!-- Sommaire propre -->
+  ${tocMarkup}
+
+  <!-- Corps de l'ouvrage (Texte Intégral Pur) -->
+  <div class="novel-body">
+    ${parsedCleanDom.innerHTML}
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const cleanFn = (title || 'editsphere-kdp').toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+    a.download = `${cleanFn}-texte-pur-kdp.html`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    notify('Fichier HTML KDP (Texte pur) exporté avec succès !');
+  }
+
+  // Download Audit Report (.txt)
+  function downloadAuditReport() {
+    const s = getLayoutSpecs();
+    const title = $('metaBookTitle').value.trim() || 'Livre';
+    const author = $('metaAuthor').value.trim() || 'Auteur';
+    const publisher = $('metaPublisher').value.trim() || 'Éditeur';
+    const isbn = $('metaIsbn').value.trim();
+
+    const report = [
+      `======================================================================`,
+      `RAPPORT D'EXTRACTION DU TEXTE INTÉGRAL PUR — EDITSPHERE KDP`,
+      `======================================================================`,
+      `Date : ${new Date().toLocaleString('fr-FR')}`,
+      `Ouvrage : ${title}`,
+      `Auteur : ${author}`,
+      `Éditeur réémetteur : ${publisher}`,
+      `ISBN-13 : ${isbn || 'Non renseigné'} (${validateIsbn13(isbn) ? 'VALIDE' : 'À VÉRIFIER'})`,
+      ``,
+      `--- BILAN DE L'ÉPURATION ---`,
+      `✓ Mode Texte Pur : ACTIF`,
+      `✓ Notes de bas de page & renvois dans le texte éliminés : ${auditStats.notesRemoved}`,
+      `✓ Tables des matières d'origine supprimées : ${auditStats.tocRemoved}`,
+      `✓ Blocs de mentions et pages d'origine retirés : ${auditStats.frontMatterRemoved}`,
+      `✓ Balises web parasites & scripts nettoyés : ${auditStats.webCleaned}`,
+      `✓ Mots dans la source brute : ${auditStats.rawWords.toLocaleString('fr-FR')}`,
+      `✓ Mots de texte pur littéraire conservés : ${auditStats.cleanWords.toLocaleString('fr-FR')}`,
+      ``,
+      `--- CARACTÉRISTIQUES BROCHÉ AMAZON KDP ---`,
+      `Format KDP : ${s.widthIn} × ${s.heightIn} pouces`,
+      `Papier : ${s.paper === 'cream' ? 'Crème' : 'Blanc'}`,
+      `Pagination estimée : ${s.totalPages} pages`,
+      `Épaisseur du dos (Spine width) : ${s.spineWidthMm.toFixed(2)} mm`,
+      `Petit fond (Reliure) : ${s.marginInsideMm} mm (Minimum KDP : ${s.minGutterMm} mm)`,
+      `Marge de confort reliure : +${s.gutterComfortMm.toFixed(1)} mm`,
+      `Grand fond (Extérieur) : ${s.marginOutsideMm} mm`,
+      `Marges haut / bas : ${s.marginTopMm} mm / ${s.marginBottomMm} mm`,
+      `======================================================================`
+    ].join('\n');
+
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport-texte-pur-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    notify('Rapport d’extraction du texte pur téléchargé.');
+  }
+
+  // Populate and open KDP Listing Modal
+  function openKdpToolkitModal() {
+    const title = $('metaBookTitle').value.trim() || 'Titre du livre';
+    const subtitle = $('metaBookSubtitle').value.trim() || 'Édition intégrale de prestige';
+    const author = $('metaAuthor').value.trim() || 'Victor Hugo';
+    const publisher = $('metaPublisher').value.trim() || 'Éditions EditSphere';
+    const origYear = $('metaOriginalYear').value.trim();
+
+    $('kdpTitleCopy').textContent = `Titre : ${title}\nSous-titre : ${subtitle}`;
+
+    const descHtml = `<h2>${esc(title)} — ${esc(subtitle)}</h2>
+<p>Découvrez ou redécouvrez ce grand chef-d’œuvre de <b>${esc(author)}</b>${origYear ? `, initialement paru en ${esc(origYear)}` : ''}, proposé ici dans une <b>édition brochée grand format (6 × 9 pouces)</b> épurée de toute annotation parasite pour un plaisir de lecture ininterrompu.</p>
+
+<h3>Les points forts de cette édition :</h3>
+<ul>
+  <li><b>Texte intégral pur :</b> l’œuvre dans son authenticité la plus totale, sans notes de bas de page intrusives ni coupures.</li>
+  <li><b>Typographie littéraire d'excellence :</b> composé avec la police <i>EB Garamond</i>, respect rigoureux des règles typographiques françaises (espaces insécables, ponctuation fine).</li>
+  <li><b>Confort de lecture haut de gamme :</b> marges intérieures étudiées pour la reliure brochée, interligne reposant.</li>
+  <li><b>Nouvelle édition de référence :</b> page de titre soignée, mentions légales complètes, papier de qualité.</li>
+</ul>
+
+<p>Une édition intemporelle, conçue pour les amoureux des grands textes et de la belle typographie.</p>`;
+
+    $('kdpDescCopy').textContent = descHtml;
+
+    $('kdpKeywordsCopy').textContent = [
+      `${author.toLowerCase()} ${title.toLowerCase()}`,
+      `livre broché ${title.toLowerCase()}`,
+      `texte intégral pur sans coupure`,
+      `roman classique littérature française`,
+      `édition brochée grand format`,
+      `chef d'œuvre domaine public`,
+      `cadeau passionné littérature classique`
+    ].join('\n');
+
+    $('kdpCategoriesCopy').textContent = `Catégories recommandées sur Amazon KDP :
+- Fiction / Littérature classique (Classics)
+- Fiction / Romans historiques (Historical)
+- Littérature française et francophone
+
+Option Domaine Public :
+Cochez la case : « Il s'agit d'une œuvre du domaine public » sur KDP.
+Mention de différenciation : « Édition intégrale avec nouvelle composition typographique et mise en page de prestige par ${publisher} ».`;
+
+    $('kdpModal').classList.add('open');
+  }
+
+  // Event Listeners setup
+  function initEvents() {
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        $(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // File input & Drag drop
+    $('fileInput').addEventListener('change', e => handleSelectedFile(e.target.files[0]));
+    const dropzone = $('dropzone');
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleSelectedFile(e.dataTransfer.files[0]);
+    });
+
+    // Bundled book load
+    $('loadBundledBtn').addEventListener('click', () => {
+      const sel = $('bundledBooksSelect');
+      const opt = sel.selectedOptions[0];
+      if (opt && opt.value) {
+        openBundledBook(opt.value, opt.dataset.filename, opt.dataset.format);
+      } else {
+        notify('Veuillez sélectionner une œuvre dans la liste.');
+      }
+    });
+
+    // Remove file
+    $('removeFileBtn').addEventListener('click', () => {
+      rawSourceHtml = '';
+      sourceFileName = '';
+      parsedCleanDom = null;
+      bookHeadings = [];
+      allBookPages = [];
+      $('fileInput').value = '';
+      $('fileName').textContent = 'Aucun fichier';
+      $('fileInfo').classList.remove('visible');
+      $('auditGrid').classList.add('hidden');
+      $('auditActionRow').classList.add('hidden');
+      $('auditStatus').textContent = 'En attente d’un manuscrit pour l’analyse.';
+      renderPreview();
+      notify('Fichier retiré.');
+    });
+
+    // Relaunch clean
+    $('cleanActionBtn').addEventListener('click', () => {
+      executeCleaning();
+      notify('Extraction du texte pur mise à jour.');
+    });
+
+    // Layout presets
+    document.querySelectorAll('.preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const map = {
+          '6x9': [6, 9],
+          '5.5x8.5': [5.5, 8.5],
+          '5x8': [5, 8],
+          '6.14x9.21': [6.14, 9.21],
+          'a5': [5.83, 8.27]
+        };
+        const dims = map[btn.dataset.size];
+        if (dims) {
+          $('pageWidth').value = dims[0];
+          $('pageHeight').value = dims[1];
+          syncPresetButtons();
+          renderPreview();
+        }
+      });
+    });
+
+    // Input changes
+    const liveFields = [
+      'metaPublisher', 'metaCollection', 'metaBookTitle', 'metaBookSubtitle',
+      'metaAuthor', 'metaEditor', 'metaOriginalYear', 'metaPubYear',
+      'metaIsbn', 'metaDepotLegal', 'metaCity', 'metaPublicDomainText',
+      'pageWidth', 'pageHeight', 'marginInside', 'marginOutside', 'marginTop', 'marginBottom',
+      'paperColor', 'fontFamily', 'fontSize', 'lineHeight', 'indent', 'headerStyle',
+      'justify', 'chapterBreak', 'enableToc',
+      'optPurgeAllNotes', 'optPurgeSourceToc', 'optPurgeSourceFrontMatter', 'optFrenchSpacing', 'optDetectVerse'
+    ];
+
+    liveFields.forEach(id => {
+      const el = $(id);
+      if (el) {
+        el.addEventListener('input', () => {
+          syncPresetButtons();
+          updateIsbnStatus();
+          renderPreview();
+        });
+        el.addEventListener('change', () => {
+          syncPresetButtons();
+          updateIsbnStatus();
+          if (id.startsWith('opt')) {
+            executeCleaning();
+          } else {
+            renderPreview();
+          }
+        });
+      }
+    });
+
+    // View toggles: Spread vs Single
+    $('btnSpreadView').addEventListener('click', () => {
+      previewMode = 'spread';
+      $('btnSpreadView').classList.add('active');
+      $('btnSingleView').classList.remove('active');
+      $('bookSpread').classList.remove('single-mode');
+      renderPreview();
+    });
+
+    $('btnSingleView').addEventListener('click', () => {
+      previewMode = 'single';
+      $('btnSingleView').classList.add('active');
+      $('btnSpreadView').classList.remove('active');
+      $('bookSpread').classList.add('single-mode');
+      renderPreview();
+    });
+
+    // Section Selector
+    $('sectionSelector').addEventListener('change', e => {
+      const val = e.target.value;
+      if (!allBookPages.length) return;
+
+      if (val === 'title') {
+        currentSpreadIndex = 1;
+        singlePageIndex = 2; // page 3 (Grand Titre)
+      } else if (val === 'legal') {
+        currentSpreadIndex = 2;
+        singlePageIndex = 3; // page 4 (Mentions légales)
+      } else if (val === 'toc') {
+        // find toc page index
+        const tocIdx = allBookPages.findIndex(p => p.type === 'toc');
+        if (tocIdx !== -1) {
+          singlePageIndex = tocIdx;
+          currentSpreadIndex = Math.floor(tocIdx / 2) + 1;
+        } else {
+          currentSpreadIndex = 2;
+        }
+      } else if (val === 'text') {
+        // find first text page
+        const textIdx = allBookPages.findIndex(p => p.type === 'text');
+        if (textIdx !== -1) {
+          singlePageIndex = textIdx;
+          currentSpreadIndex = Math.floor(textIdx / 2) + 1;
+        } else {
+          currentSpreadIndex = 3;
+        }
+      }
+      renderPreview();
+    });
+
+    // Pagination controls
+    function goToPrevPage() {
+      if (previewMode === 'single') {
+        if (singlePageIndex > 0) {
+          singlePageIndex--;
+          renderPreview();
+        }
+      } else {
+        if (currentSpreadIndex > 0) {
+          currentSpreadIndex--;
+          renderPreview();
+        }
+      }
+    }
+
+    function goToNextPage() {
+      if (previewMode === 'single') {
+        if (singlePageIndex < allBookPages.length - 1) {
+          singlePageIndex++;
+          renderPreview();
+        }
+      } else {
+        const totalSpreads = Math.ceil(allBookPages.length / 2);
+        if (currentSpreadIndex < totalSpreads) {
+          currentSpreadIndex++;
+          renderPreview();
+        }
+      }
+    }
+
+    $('prevPageBtn').addEventListener('click', goToPrevPage);
+    $('nextPageBtn').addEventListener('click', goToNextPage);
+
+    // Keyboard navigation
+    window.addEventListener('keydown', e => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToPrevPage();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goToNextPage();
+      }
+    });
+
+    // Zoom controls
+    $('zoomInBtn').addEventListener('click', () => {
+      if (zoomLevel < 1.4) {
+        zoomLevel += 0.1;
+        $('bookSpreadWrap').style.transform = `scale(${zoomLevel})`;
+        $('zoomResetBtn').textContent = `${Math.round(zoomLevel * 100)}%`;
+      }
+    });
+
+    $('zoomOutBtn').addEventListener('click', () => {
+      if (zoomLevel > 0.7) {
+        zoomLevel -= 0.1;
+        $('bookSpreadWrap').style.transform = `scale(${zoomLevel})`;
+        $('zoomResetBtn').textContent = `${Math.round(zoomLevel * 100)}%`;
+      }
+    });
+
+    $('zoomResetBtn').addEventListener('click', () => {
+      zoomLevel = 1.0;
+      $('bookSpreadWrap').style.transform = 'scale(1)';
+      $('zoomResetBtn').textContent = '100%';
+    });
+
+    // Export & Print buttons
+    $('exportHtmlBtn').addEventListener('click', exportKdpFile);
+    $('downloadAuditBtn').addEventListener('click', downloadAuditReport);
+
+    $('printPdfBtn').addEventListener('click', () => {
+      if (!parsedCleanDom) {
+        notify('Veuillez d’abord importer un livre.');
+        return;
+      }
+      notify('Ouverture de la boîte d’impression PDF KDP...');
+      setTimeout(() => window.print(), 300);
+    });
+
+    // Modal
+    $('kdpSheetBtn').addEventListener('click', openKdpToolkitModal);
+    $('closeKdpModal').addEventListener('click', () => $('kdpModal').classList.remove('open'));
+    $('kdpModal').addEventListener('click', e => {
+      if (e.target === $('kdpModal')) $('kdpModal').classList.remove('open');
+    });
+
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.copy;
+        const text = $(targetId)?.textContent || '';
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = 'Copié !';
+            setTimeout(() => btn.textContent = 'Copier', 1800);
+            notify('Copié dans le presse-papier !');
+          });
+        }
+      });
+    });
+
+    // Reset button
+    $('resetBtn').addEventListener('click', () => {
+      if (confirm('Réinitialiser tous les réglages aux valeurs par défaut ?')) {
+        $('metaPublisher').value = 'Éditions EditSphere';
+        $('metaCollection').value = 'Collection Les Grands Textes';
+        $('metaPubYear').value = '2026';
+        $('metaIsbn').value = '979-10-98765-43-2';
+        $('metaDepotLegal').value = '4e trimestre 2026';
+        $('metaCity').value = 'Paris';
+        $('pageWidth').value = '6';
+        $('pageHeight').value = '9';
+        $('marginInside').value = '18';
+        $('marginOutside').value = '16';
+        $('marginTop').value = '18';
+        $('marginBottom').value = '18';
+        $('paperColor').value = 'cream';
+        $('fontFamily').value = "'EB Garamond', Garamond, Georgia, serif";
+        $('fontSize').value = '10.5';
+        $('lineHeight').value = '1.4';
+        $('indent').value = '1.5';
+        $('justify').checked = true;
+        $('chapterBreak').checked = true;
+        syncPresetButtons();
+        updateIsbnStatus();
+        renderPreview();
+        notify('Réglages réinitialisés.');
+      }
+    });
+  }
+
+  // Initial boot
+  loadBundledBooks();
+  initEvents();
+  syncPresetButtons();
+  updateIsbnStatus();
+  renderPreview();
 })();
 </script>
 </body>

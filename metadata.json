@@ -1,0 +1,8 @@
+{
+  "name": "EditSphere — atelier de mise en page KDP",
+  "description": "Atelier de mise en page et de préparation de livres du domaine public (EPUB, HTML, MHT) pour impression brochée Amazon KDP avec régénération des métadonnées éditeur.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
